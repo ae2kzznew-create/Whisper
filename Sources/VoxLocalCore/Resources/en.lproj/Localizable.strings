@@ -1,0 +1,203 @@
+/* Common */
+"app.name" = "VoxLocal";
+"common.ok" = "OK";
+"common.cancel" = "Cancel";
+
+/* Dictation states */
+"state.idle" = "Ready";
+"state.preparing" = "Preparing…";
+"state.recording" = "Listening…";
+"state.stopping" = "Stopping…";
+"state.transcribing" = "Transcribing…";
+"state.refining" = "Refining…";
+"state.inserting" = "Inserting…";
+"state.completed" = "Done";
+"state.cancelled" = "Cancelled";
+"state.error" = "Error";
+
+/* Errors */
+"error.mic.denied" = "Microphone access is denied. Allow it in System Settings → Privacy & Security → Microphone.";
+"error.mic.unavailable" = "The microphone is unavailable or was disconnected while recording.";
+"error.recording.failed" = "Could not start audio recording.";
+"error.recording.empty" = "Nothing was recognized: the recording is empty or too short.";
+"error.whisper.binary" = "The recognition engine (whisper-cli) was not found. Reinstall the app or run scripts/bootstrap.sh.";
+"error.whisper.model.missing" = "No speech model is installed. Download one in Settings → Transcription.";
+"error.whisper.model.invalid" = "The model file is corrupted or incompatible. Download the model again.";
+"error.whisper.failed" = "Transcription failed. See the log for details.";
+"error.whisper.timeout" = "Transcription took too long and was stopped.";
+"error.whisper.output" = "Could not read the transcription result.";
+"error.whisper.arch" = "The recognition engine was built for a different CPU architecture.";
+"error.hotkey.conflict" = "The shortcut %@ is already taken by another app. Pick a different one in Settings.";
+"error.hotkey.failed" = "Could not register the shortcut %@.";
+"error.insert.target.gone" = "The app you were dictating into is gone. The text was copied to the clipboard.";
+
+/* Text insertion */
+"insert.reason.clipboardMode" = "Text copied to the clipboard (clipboard-only mode). Press ⌘V to paste.";
+"insert.reason.targetGone" = "The original app is unavailable. The text was copied to the clipboard — paste it manually (⌘V).";
+"insert.reason.noAccessibility" = "Accessibility permission is missing — the text will be copied to the clipboard. Paste it manually (⌘V).";
+"insert.reason.secureField" = "A secure (password) field is focused. The text was copied to the clipboard — paste manually if appropriate.";
+"insert.reason.pasteFailed" = "The app rejected the paste. The text was copied to the clipboard — press ⌘V.";
+
+/* Overlay */
+"overlay.esc" = "Esc — cancel";
+"overlay.level.ax" = "Microphone level";
+
+/* Menu */
+"menu.status" = "Status: %@";
+"menu.start" = "Start Dictation";
+"menu.stop" = "Stop & Transcribe";
+"menu.cancel" = "Cancel Dictation";
+"menu.settings" = "Settings…";
+"menu.models" = "Open Model Folder";
+"menu.logs" = "Open Logs";
+"menu.quit" = "Quit VoxLocal";
+
+/* Models */
+"models.download.busy" = "Another model is already downloading.";
+
+/* Refinement presets */
+"refine.preset.rawTranscript" = "Raw transcript";
+"refine.preset.cleanDictation" = "Clean dictation";
+"refine.preset.concise" = "Concise";
+"refine.preset.businessStyle" = "Business style";
+"refine.preset.preserveSpokenWording" = "Preserve spoken wording";
+"refine.preset.custom" = "Custom instruction";
+"refine.fallback.notice" = "Refinement unavailable — the raw transcript was inserted.";
+
+/* Settings */
+"settings.title" = "VoxLocal Settings";
+"settings.tab.general" = "General";
+"settings.tab.transcription" = "Transcription";
+"settings.tab.refinement" = "Refinement";
+"settings.tab.privacy" = "Privacy";
+
+"settings.hotkey.section" = "Global keyboard shortcut";
+"settings.hotkey" = "Shortcut";
+"settings.hotkey.press" = "Press keys…";
+"settings.hotkey.mode" = "Mode";
+"settings.hotkey.mode.hold" = "Press and hold (record while held)";
+"settings.hotkey.mode.toggle" = "Toggle (press to start, press to stop)";
+
+"settings.audio.section" = "Audio";
+"settings.mic" = "Microphone";
+"settings.mic.default" = "System default";
+
+"settings.insertion.section" = "Text insertion";
+"settings.insertion" = "Method";
+"settings.insertion.auto" = "Insert into the active app automatically";
+"settings.insertion.clipboard" = "Copy to clipboard only";
+
+"settings.app.section" = "Application";
+"settings.launchAtLogin" = "Launch at login";
+"settings.launchAtLogin.error" = "Could not change login item: %@";
+"settings.language.ui" = "Interface language";
+"settings.language.ui.ru" = "Русский";
+"settings.language.ui.en" = "English";
+"settings.language.ui.system" = "Match system";
+
+"settings.model.installed" = "Installed models";
+"settings.model.none" = "No models installed yet. Download one from the list below.";
+"settings.model" = "Active model";
+"settings.model.notInstalled" = "%@ (not installed)";
+"settings.model.download" = "Model downloads (Hugging Face, official whisper.cpp repository)";
+"settings.model.englishOnly" = "English only";
+"settings.model.installedAx" = "Installed";
+"settings.model.get" = "Download…";
+"settings.model.confirm.title" = "Download model?";
+"settings.model.confirm.download" = "Download (~%@)";
+"settings.model.confirm.message" = "The “%@” model will be downloaded from huggingface.co (the official whisper.cpp source). Size is about %@. Continue?";
+"settings.model.download.error" = "Download failed: %@";
+
+"settings.recognition.section" = "Recognition options";
+"settings.spoken" = "Spoken language";
+"settings.spoken.auto" = "Auto-detect";
+"settings.spoken.ru" = "Russian";
+"settings.spoken.en" = "English";
+"settings.threads" = "Whisper threads: %d";
+"settings.artifacts" = "Remove recognition artifacts ([music], [BLANK_AUDIO], etc.)";
+
+"settings.refine.enabled" = "Refine text with a local LLM (Ollama)";
+"settings.refine.hint" = "Optional. The app fully works without Ollama: when the server is unavailable, the raw transcript is inserted.";
+"settings.refine.ollama.section" = "Ollama server (localhost only)";
+"settings.refine.endpoint" = "Server address";
+"settings.refine.model" = "Model";
+"settings.refine.check" = "Check";
+"settings.refine.timeout" = "Timeout";
+"settings.refine.preset.section" = "Processing style";
+"settings.refine.preset" = "Preset";
+"settings.refine.custom" = "Custom instruction";
+"settings.refine.status.checking" = "Checking…";
+"settings.refine.status.ok" = "Server and model available ✓";
+"settings.refine.status.nomodel" = "Model not found. Installed: %@";
+"settings.refine.status.unreachable" = "Server unreachable: %@";
+"settings.refine.status.pickModel" = "Server is up. Pick a model: %@";
+"settings.refine.nonlocal" = "The address must point to localhost (127.0.0.1). Remote addresses are blocked for privacy.";
+
+"settings.diagnostics.section" = "Diagnostics";
+"settings.loglevel" = "Log level";
+"settings.loglevel.off" = "Off";
+"settings.loglevel.error" = "Errors only";
+"settings.loglevel.info" = "Normal";
+"settings.loglevel.debug" = "Verbose";
+"settings.resetOnboarding" = "Show the welcome setup again";
+
+/* Privacy */
+"privacy.title" = "How VoxLocal handles your data";
+"privacy.p1" = "Audio is processed only on this Mac — recognition runs on local whisper.cpp.";
+"privacy.p2" = "No cloud APIs are used or required. No API keys needed.";
+"privacy.p3" = "The temporary audio recording is deleted right after transcription, cancellation or an error.";
+"privacy.p4" = "Ollama requests go to localhost only and never leave the computer.";
+"privacy.p5" = "No analytics, telemetry or ads. The app makes no network requests except model downloads you explicitly start.";
+"privacy.logs" = "Logs contain no audio, no dictated text and no clipboard contents; file paths are shortened. Log size is bounded.";
+
+/* Onboarding */
+"onboarding.title" = "Welcome to VoxLocal";
+"onboarding.welcome.title" = "VoxLocal — local dictation";
+"onboarding.welcome.text" = "Press the shortcut, dictate, and the text appears in the active application. All recognition happens on your Mac.";
+"onboarding.welcome.point1" = "Works in any application";
+"onboarding.welcome.point2" = "Fully offline recognition (whisper.cpp)";
+"onboarding.welcome.point3" = "Optional text cleanup with a local LLM";
+"onboarding.welcome.point4" = "No cloud, telemetry or subscriptions";
+"onboarding.mic.title" = "Microphone access";
+"onboarding.mic.text" = "Recording speech requires microphone access. macOS will show a prompt — click “Allow”.";
+"onboarding.mic.grant" = "Request access";
+"onboarding.openSettings" = "Open System Settings";
+"onboarding.recheck" = "Check again";
+"onboarding.ax.title" = "Accessibility";
+"onboarding.ax.text" = "To insert text into other apps, enable VoxLocal in System Settings → Privacy & Security → Accessibility.";
+"onboarding.ax.optional" = "You can skip this: without the permission the text is copied to the clipboard and you paste it manually (⌘V).";
+"onboarding.engine.title" = "Recognition engine";
+"onboarding.engine.ok" = "whisper-cli found: %@";
+"onboarding.engine.missing" = "whisper-cli was not found. Build it with scripts/bootstrap.sh in the project folder or reinstall the app.";
+"onboarding.model.title" = "Speech model";
+"onboarding.model.text" = "A Whisper model is required. We recommend “base” — a good quality/speed balance for Russian and English.";
+"onboarding.model.installed" = "Already installed: %@";
+"onboarding.model.recommended" = "%@ (recommended)";
+"onboarding.model.more" = "More models (small, medium, large-v3) are available in Settings → Transcription.";
+"onboarding.ollama.title" = "Ollama (optional)";
+"onboarding.ollama.text" = "If Ollama (ollama.com) is installed, VoxLocal can fix punctuation and remove filler words with a local LLM. It is optional: without Ollama the raw transcript is inserted.";
+"onboarding.ollama.optional" = "You can skip this step and enable refinement later in Settings.";
+"onboarding.ollama.noModels" = "The server is up but no models are installed. Run: ollama pull qwen2.5:3b";
+"onboarding.ollama.found" = "Ollama is available. Models: %@";
+"onboarding.ollama.unavailable" = "Ollama is not responding on localhost:11434. Install it from ollama.com or skip this step.";
+"onboarding.hotkey.title" = "Keyboard shortcut";
+"onboarding.hotkey.text" = "Current shortcut: %@. Hold it while dictating; release to start transcription.";
+"onboarding.hotkey.modes" = "In Settings you can switch to toggle mode (press to start, press again to stop) and change the shortcut.";
+"onboarding.test.title" = "Test dictation";
+"onboarding.test.text" = "Click the button, say a couple of phrases and stop the recording. The recognized text appears below — nothing is inserted anywhere.";
+"onboarding.test.start" = "Start recording";
+"onboarding.test.stop" = "Stop";
+"onboarding.test.result" = "Recognized text";
+"onboarding.done.title" = "All set";
+"onboarding.done.text" = "VoxLocal lives in the menu bar (microphone icon). Press the shortcut in any app and dictate. Settings are always available from the menu.";
+"onboarding.status.granted" = "Granted";
+"onboarding.status.denied" = "Not granted";
+"onboarding.status.notdetermined" = "Not requested yet";
+"onboarding.progress.ax" = "Setup progress";
+"onboarding.back" = "Back";
+"onboarding.next" = "Next";
+"onboarding.finish" = "Finish";
+
+/* Alerts */
+"alert.hotkeyConflict.title" = "Shortcut already in use";
+"alert.hotkeyConflict.hint" = "Open Settings → General and pick another shortcut.";

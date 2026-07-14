@@ -1,0 +1,14 @@
+# Build products
+.build/
+dist/
+
+# Third-party sources and tools fetched by scripts/bootstrap.sh
+vendor/
+
+# Xcode / SwiftPM local state
+.swiftpm/
+*.xcodeproj
+xcuserdata/
+
+# macOS
+.DS_Store
