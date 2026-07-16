@@ -135,4 +135,65 @@
 "settings.diagnostics.section" = "Диагностика";
 "settings.loglevel" = "Уровень журнала";
 "settings.loglevel.off" = "Выключен";
-"settings.loglevel.error" = "Только ош
+"settings.loglevel.error" = "Только ошибки";
+"settings.loglevel.info" = "Обычный";
+"settings.loglevel.debug" = "Подробный";
+"settings.resetOnboarding" = "Показать приветственную настройку заново";
+
+/* Конфиденциальность */
+"privacy.title" = "Как VoxLocal обращается с данными";
+"privacy.p1" = "Звук обрабатывается только на этом ПК — распознавание выполняет локальный whisper.cpp.";
+"privacy.p2" = "Облачные API не используются и не требуются. Ключи API не нужны.";
+"privacy.p3" = "Временная аудиозапись удаляется сразу после распознавания, отмены или ошибки.";
+"privacy.p4" = "Запросы к Ollama идут только на localhost и не покидают компьютер.";
+"privacy.p5" = "Нет аналитики, телеметрии и рекламы. Приложение ничего не отправляет в сеть, кроме загрузки моделей по вашей явной команде.";
+"privacy.logs" = "Журнал не содержит аудио, текстов диктовок и содержимого буфера обмена; пути к файлам сокращаются. Размер журнала ограничен.";
+
+/* Онбординг */
+"onboarding.title" = "Добро пожаловать в VoxLocal";
+"onboarding.welcome.title" = "VoxLocal — локальная диктовка";
+"onboarding.welcome.text" = "Нажмите сочетание клавиш, продиктуйте текст — он появится в активном приложении. Всё распознавание происходит на вашем ПК.";
+"onboarding.welcome.point1" = "Работает в любом приложении";
+"onboarding.welcome.point2" = "Распознавание полностью офлайн (whisper.cpp)";
+"onboarding.welcome.point3" = "Необязательное улучшение текста локальной LLM";
+"onboarding.welcome.point4" = "Без облака, телеметрии и подписок";
+"onboarding.mic.title" = "Доступ к микрофону";
+"onboarding.mic.text" = "Для записи речи нужен доступ к микрофону. Если Windows покажет запрос — нажмите «Разрешить»; доступ также можно включить в Параметрах Windows.";
+"onboarding.mic.grant" = "Запросить доступ";
+"onboarding.openSettings" = "Открыть Параметры Windows";
+"onboarding.recheck" = "Проверить снова";
+"onboarding.engine.title" = "Движок распознавания";
+"onboarding.engine.ok" = "whisper-cli найден: %@";
+"onboarding.engine.missing" = "whisper-cli.exe не найден. Соберите whisper.cpp под Windows и поместите whisper-cli.exe в папку tools рядом с приложением.";
+"onboarding.model.title" = "Модель распознавания";
+"onboarding.model.text" = "Для работы нужна модель Whisper. Рекомендуем «base» — хороший баланс качества и скорости для русского и английского.";
+"onboarding.model.installed" = "Уже установлены: %@";
+"onboarding.model.recommended" = "%@ (рекомендуется)";
+"onboarding.model.more" = "Другие модели (small, medium, large-v3) доступны в Настройках → Распознавание.";
+"onboarding.ollama.title" = "Ollama (необязательно)";
+"onboarding.ollama.text" = "Если установлен Ollama (ollama.com), VoxLocal может исправлять пунктуацию и убирать слова-паразиты локальной LLM. Это не обязательно: без Ollama вставляется исходная расшифровка.";
+"onboarding.ollama.optional" = "Шаг можно пропустить и включить улучшение позже в Настройках.";
+"onboarding.ollama.noModels" = "Сервер доступен, но модели не установлены. Выполните: ollama pull qwen2.5:3b";
+"onboarding.ollama.found" = "Ollama доступен. Модели: %@";
+"onboarding.ollama.unavailable" = "Ollama не отвечает на localhost:11434. Установите его с ollama.com или пропустите шаг.";
+"onboarding.hotkey.title" = "Сочетание клавиш";
+"onboarding.hotkey.text" = "Текущее сочетание: %@. Удерживайте его во время диктовки; отпустите — начнётся распознавание.";
+"onboarding.hotkey.modes" = "В Настройках можно выбрать режим переключения (нажать — начать, нажать ещё раз — остановить) и другое сочетание.";
+"onboarding.test.title" = "Проверка диктовки";
+"onboarding.test.text" = "Нажмите кнопку, скажите пару фраз и остановите запись. Распознанный текст появится ниже — без вставки в другие приложения.";
+"onboarding.test.start" = "Начать запись";
+"onboarding.test.stop" = "Остановить";
+"onboarding.test.result" = "Распознанный текст";
+"onboarding.done.title" = "Всё готово";
+"onboarding.done.text" = "VoxLocal живёт в области уведомлений (значок микрофона в трее). Нажмите сочетание клавиш в любом приложении и диктуйте. Настройки всегда доступны из меню трея.";
+"onboarding.status.granted" = "Разрешено";
+"onboarding.status.denied" = "Нет доступа";
+"onboarding.status.notdetermined" = "Ещё не запрашивалось";
+"onboarding.progress.ax" = "Прогресс настройки";
+"onboarding.back" = "Назад";
+"onboarding.next" = "Далее";
+"onboarding.finish" = "Завершить";
+
+/* Диалоги */
+"alert.hotkeyConflict.title" = "Сочетание клавиш занято";
+"alert.hotkeyConflict.hint" = "Откройте Настройки → Основные и выберите другое сочетание.";
