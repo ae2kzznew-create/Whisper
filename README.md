@@ -25,7 +25,7 @@
 
 ## Requirements
 
-- macOS **14+** (built and tested on macOS 26, Apple Silicon).
+- macOS **14+** (built and tested on macOS 26, Apple Silicon); **macOS 13** works via the fallback build below.
 - Apple Silicon recommended (Metal acceleration). Intel builds work without Metal.
 - Xcode **Command Line Tools** (or full Xcode) to build.
 - Disk space: ~500 MB for build artifacts + your chosen model (base ≈ 148 MB, small ≈ 488 MB, large-v3 ≈ 3.1 GB).
@@ -45,6 +45,23 @@ git clone https://github.com/romarayt/VoxLocal.git && cd VoxLocal
 ```
 
 No Homebrew, CocoaPods or other global package managers are required; everything is project-local (`vendor/`).
+
+### Intel Mac / macOS 13 (fallback build)
+
+On older machines with Command Line Tools only (no full Xcode), SwiftPM can be broken
+(`xcrun: unable to lookup item 'PlatformPath'` — a known CLT 14.x issue). Use the direct
+swiftc build instead of `test.sh`/`build_app.sh`:
+
+```bash
+./scripts/bootstrap.sh
+./scripts/download_model.sh base
+./scripts/build_app_direct.sh   # compiles with swiftc, no SwiftPM; min macOS 13
+./scripts/run.sh
+```
+
+Verified on an Intel iMac, macOS 13.7, Swift 5.8 (CLT 14.3): builds, transcribes RU/EN
+(base model, ~3 s per short phrase, no Metal). `swift test` is unavailable there — CLT
+ships without XCTest.
 
 ## First-run setup (permissions)
 

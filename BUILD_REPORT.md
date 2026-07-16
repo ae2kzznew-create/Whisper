@@ -110,3 +110,13 @@ dist/VoxLocal.app   (arm64, ad-hoc signed, org.voxlocal.VoxLocal, v1.0.0)
 ```
 
 Rebuild from scratch: `./scripts/bootstrap.sh && ./scripts/test.sh && ./scripts/build_app.sh && ./scripts/run.sh`.
+
+## Addendum — Intel iMac / macOS 13.7 port (2026-07-16)
+
+Environment: Intel x86_64 iMac, macOS 13.7.8, Swift 5.8.1 (CLT 14.3, no full Xcode).
+
+- SwiftPM is unusable there: `swift build` fails with `xcrun: unable to lookup item 'PlatformPath'` (CLT 14.x has no platform dir; fixed upstream in later toolchains). `swift test` impossible — CLT ships without XCTest.
+- Added `scripts/build_app_direct.sh`: compiles VoxLocalCore + entry point with plain swiftc as a single module (generates a `Bundle.module` shim replicating SwiftPM's accessor), assembles and ad-hoc signs `dist/VoxLocal.app` with `LSMinimumSystemVersion` 13.0.
+- `Package.swift` lowered to swift-tools 5.8 / platform .v13 (still builds with the modern toolchain).
+- `VoxLocalMain` now uses `@MainActor static func main()` instead of `MainActor.assumeIsolated` (unavailable in the macOS 13 SDK; behaviour identical).
+- Verified on the iMac: bootstrap (whisper-cli built without Metal), app launches (UIElement, hotkey ⌥Space registered), end-to-end `say` → `afconvert` → `whisper-cli` transcription passes in Russian and English with `ggml-base.bin` (~3 s per short phrase, CPU only).
