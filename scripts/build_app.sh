@@ -26,6 +26,9 @@ mkdir -p "$APP_BUNDLE/Contents/MacOS" "$APP_BUNDLE/Contents/Resources"
 
 cp "$BIN" "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
 cp "$WHISPER_CLI" "$APP_BUNDLE/Contents/MacOS/whisper-cli"
+if [[ -x "$WHISPER_DIR/build/bin/whisper-server" ]]; then
+  cp "$WHISPER_DIR/build/bin/whisper-server" "$APP_BUNDLE/Contents/MacOS/whisper-server"
+fi
 cp -R "$RESOURCE_BUNDLE" "$APP_BUNDLE/Contents/Resources/"
 
 printf 'APPL????' > "$APP_BUNDLE/Contents/PkgInfo"

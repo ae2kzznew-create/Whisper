@@ -83,7 +83,15 @@ public final class TextInserter {
                 return .insertedViaAccessibility
             }
         case .none:
-            break
+            // No editable focus is visible via Accessibility. The paste may
+            // still land (apps with poor AX support), but it may equally go
+            // nowhere — so paste WITHOUT restoring the old clipboard: the
+            // dictation must never be lost. The user is told it is on the
+            // clipboard in case nothing visibly happened.
+            if await pasteWithClipboardRestore(text, restoreAfterPaste: false) {
+                Log.shared.info("insertion: no focused text field; pasted and kept text on clipboard (chars: \(text.count))")
+                return .clipboardOnly(reasonKey: "insert.reason.noFocusedField")
+            }
         }
 
         if await pasteWithClipboardRestore(text) {
@@ -138,7 +146,7 @@ public final class TextInserter {
     // MARK: - Clipboard + synthetic ⌘V path
 
     @MainActor
-    private func pasteWithClipboardRestore(_ text: String) async -> Bool {
+    private func pasteWithClipboardRestore(_ text: String, restoreAfterPaste: Bool = true) async -> Bool {
         guard !Task.isCancelled else { return false }
         let previousItems = pasteboard.snapshotItems()
         let hadPreviousContent = !previousItems.isEmpty
@@ -146,6 +154,9 @@ public final class TextInserter {
 
         guard postCmdV() else {
             return false
+        }
+        guard restoreAfterPaste else {
+            return true
         }
 
         // The target app needs time to consume the pasteboard before the

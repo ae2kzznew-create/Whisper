@@ -73,6 +73,9 @@ mkdir -p "$APP_BUNDLE/Contents/MacOS" "$APP_BUNDLE/Contents/Resources"
 
 cp "$BUILD_DIR/$APP_NAME" "$APP_BUNDLE/Contents/MacOS/$APP_NAME"
 cp "$WHISPER_CLI" "$APP_BUNDLE/Contents/MacOS/whisper-cli"
+if [[ -x "$WHISPER_DIR/build/bin/whisper-server" ]]; then
+  cp "$WHISPER_DIR/build/bin/whisper-server" "$APP_BUNDLE/Contents/MacOS/whisper-server"
+fi
 
 RESOURCE_BUNDLE="$APP_BUNDLE/Contents/Resources/VoxLocal_VoxLocalCore.bundle"
 mkdir -p "$RESOURCE_BUNDLE"

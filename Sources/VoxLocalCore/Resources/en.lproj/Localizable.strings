@@ -201,3 +201,13 @@
 /* Alerts */
 "alert.hotkeyConflict.title" = "Shortcut already in use";
 "alert.hotkeyConflict.hint" = "Open Settings → General and pick another shortcut.";
+
+"key.right" = "Right %@";
+
+"settings.keepWarm" = "Keep model loaded in memory (faster response)";
+"settings.keepWarm.hint" = "The model loads once and stays ready. Uses an extra 150–500 MB of RAM while the app is running.";
+"settings.history.section" = "Dictation journal";
+"settings.history.enabled" = "Save recognized text to a journal";
+"settings.history.hint" = "The journal is stored only on this Mac. Audio is still never saved.";
+"settings.history.open" = "Open journal";
+"insert.reason.noFocusedField" = "No text field found — the text is on the clipboard, paste with ⌘V.";

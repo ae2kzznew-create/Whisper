@@ -1,3 +1,4 @@
+import AppKit
 import Carbon.HIToolbox
 import Foundation
 
@@ -25,6 +26,25 @@ public final class HotkeyManager {
     private var mainHotkey: EventHotKeyRef?
     private var escapeHotkey: EventHotKeyRef?
     private(set) public var registeredCombo: KeyCombo?
+
+    // Modifier-only hotkey (e.g. a bare right ⌥): Carbon can't register a
+    // lone modifier, so we watch flagsChanged events instead. The global
+    // monitor needs the Accessibility permission the app already requests
+    // for text insertion.
+    private var flagsMonitors: [Any] = []
+    private var modifierIsDown = false
+
+    /// NSDeviceIndependentModifierFlagsMask; spelled out because the macOS 13
+    /// SDK's Swift overlay lacks `.deviceIndependentFlagsOnly`.
+    static let deviceIndependentMask = NSEvent.ModifierFlags(rawValue: 0xFFFF_0000)
+
+    private static let modifierFlagByKeyCode: [UInt32: NSEvent.ModifierFlags] = [
+        54: .command, 55: .command,
+        56: .shift, 60: .shift,
+        58: .option, 61: .option,
+        59: .control, 62: .control,
+        63: .function,
+    ]
 
     public init() {}
 
@@ -86,6 +106,10 @@ public final class HotkeyManager {
     /// The new combo is registered *before* the old one is removed, so a
     /// failed change keeps the previously working shortcut alive.
     public func registerMainHotkey(_ combo: KeyCombo) throws {
+        if combo.isModifierOnly {
+            registerModifierOnlyHotkey(combo)
+            return
+        }
         installHandlerIfNeeded()
         var ref: EventHotKeyRef?
         let hotkeyID = EventHotKeyID(signature: Self.signature, id: Self.mainHotkeyID)
@@ -109,8 +133,50 @@ public final class HotkeyManager {
         if let mainHotkey {
             UnregisterEventHotKey(mainHotkey)
             self.mainHotkey = nil
-            registeredCombo = nil
         }
+        removeFlagsMonitors()
+        registeredCombo = nil
+    }
+
+    // MARK: - Modifier-only hotkey (flagsChanged monitors)
+
+    private func registerModifierOnlyHotkey(_ combo: KeyCombo) {
+        unregisterMainHotkey()
+        let handler: (NSEvent) -> Void = { [weak self] event in
+            self?.handleFlagsChanged(event, combo: combo)
+        }
+        if let global = NSEvent.addGlobalMonitorForEvents(matching: .flagsChanged, handler: handler) {
+            flagsMonitors.append(global)
+        } else {
+            Log.shared.error("global flagsChanged monitor unavailable — modifier-only hotkey needs the Accessibility permission")
+        }
+        flagsMonitors.append(NSEvent.addLocalMonitorForEvents(matching: .flagsChanged) { event in
+            handler(event)
+            return event
+        } as Any)
+        registeredCombo = combo
+        Log.shared.info("hotkey registered: \(combo.displayString) (modifier-only)")
+    }
+
+    private func handleFlagsChanged(_ event: NSEvent, combo: KeyCombo) {
+        guard UInt32(event.keyCode) == combo.keyCode,
+              let flag = Self.modifierFlagByKeyCode[combo.keyCode] else { return }
+        let isDown = event.modifierFlags.intersection(HotkeyManager.deviceIndependentMask).contains(flag)
+        if isDown, !modifierIsDown {
+            modifierIsDown = true
+            DispatchQueue.main.async { [weak self] in self?.onMainKeyDown?() }
+        } else if !isDown, modifierIsDown {
+            modifierIsDown = false
+            DispatchQueue.main.async { [weak self] in self?.onMainKeyUp?() }
+        }
+    }
+
+    private func removeFlagsMonitors() {
+        for monitor in flagsMonitors {
+            NSEvent.removeMonitor(monitor)
+        }
+        flagsMonitors.removeAll()
+        modifierIsDown = false
     }
 
     /// Escape is captured system-wide only while dictation is in flight.
