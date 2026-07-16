@@ -20,13 +20,12 @@ dotnet build -c Release
 
 Результат: `src/VoxLocal.App/bin/Release/net8.0-windows/VoxLocal.exe`.
 
-> **Важно:** перед первой сборкой добавьте иконки и whisper-cli (см. ниже), иначе:
-> - без файлов `Icons/*.ico` сборка упадёт (они включены в .csproj как обязательные ресурсы);
-> - без `tools/whisper-cli.exe` приложение соберётся, но онбординг сообщит, что движок распознавания не найден.
+> **Важно:** без `tools/whisper-cli.exe` приложение соберётся, но онбординг сообщит, что движок распознавания не найден (см. раздел 2). Иконки `Icons/*.ico` необязательны: без них иконки трея рисуются программно, а у exe будет стандартная иконка.
 
-## 1. Иконки (`src/VoxLocal.App/Icons/`)
+## 1. Иконки (`src/VoxLocal.App/Icons/`) — необязательно
 
-Нужны 4 файла: `mic.ico`, `mic-fill.ico`, `waveform.ico`, `mic-slash.ico` (мультиразмерные .ico: 16/24/32/48/256 px). Это аналоги SF Symbols `mic`, `mic.fill`, `waveform`, `mic.slash` — можно сконвертировать любые подходящие глифы (например, из Fluent UI System Icons) в .ico.
+По умолчанию иконки трея рисуются кодом (GDI+), поэтому проект собирается и работает без каких-либо .ico-файлов.
+Если хотите фирменные иконки, положите сюда 4 файла: `mic.ico`, `mic-fill.ico`, `waveform.ico`, `mic-slash.ico` (мультиразмерные .ico: 16/24/32/48/256 px). Это аналоги SF Symbols `mic`, `mic.fill`, `waveform`, `mic.slash` — можно сконвертировать любые подходящие глифы (например, из Fluent UI System Icons) в .ico. При наличии файлов они автоматически встраиваются в приложение и используются вместо программных, а `mic.ico` становится иконкой exe.
 
 ## 2. Движок распознавания (`src/VoxLocal.App/tools/`)
 
@@ -80,6 +79,6 @@ VoxLocal/
     │   ├── Insertion, Refinement, Settings,
     │   └── Permissions, Utilities
     ├── Resources/{ru,en}/Localizable.strings
-    ├── Icons/  (добавьте 4 .ico — см. выше)
-    └── tools/  (добавьте whisper-cli.exe + DLL — см. выше)
+    ├── Icons/  (необязательно: 4 .ico — см. раздел 1)
+    └── tools/  (добавьте whisper-cli.exe + DLL — см. раздел 2)
 ```
