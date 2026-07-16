@@ -1,0 +1,138 @@
+/* Общие */
+"app.name" = "VoxLocal";
+"common.ok" = "ОК";
+"common.cancel" = "Отмена";
+
+/* Состояния диктовки */
+"state.idle" = "Готов";
+"state.preparing" = "Подготовка…";
+"state.recording" = "Слушаю…";
+"state.stopping" = "Остановка…";
+"state.transcribing" = "Распознавание…";
+"state.refining" = "Улучшение текста…";
+"state.inserting" = "Вставка…";
+"state.completed" = "Готово";
+"state.cancelled" = "Отменено";
+"state.error" = "Ошибка";
+
+/* Ошибки */
+"error.mic.denied" = "Нет доступа к микрофону. Разрешите его в Параметрах Windows → Конфиденциальность и безопасность → Микрофон.";
+"error.mic.unavailable" = "Микрофон недоступен или был отключён во время записи.";
+"error.recording.failed" = "Не удалось начать запись звука.";
+"error.recording.empty" = "Речь не распознана: запись пуста или слишком короткая.";
+"error.whisper.binary" = "Компонент распознавания (whisper-cli.exe) не найден. Поместите его в папку tools рядом с приложением или переустановите приложение.";
+"error.whisper.model.missing" = "Модель распознавания не установлена. Скачайте её в Настройках → Распознавание.";
+"error.whisper.model.invalid" = "Файл модели повреждён или несовместим. Скачайте модель заново.";
+"error.whisper.failed" = "Распознавание завершилось с ошибкой. Подробности в журнале.";
+"error.whisper.timeout" = "Распознавание заняло слишком много времени и было остановлено.";
+"error.whisper.output" = "Не удалось прочитать результат распознавания.";
+"error.whisper.arch" = "Компонент распознавания собран для другой архитектуры процессора.";
+"error.hotkey.conflict" = "Сочетание %@ уже занято другим приложением. Выберите другое в Настройках.";
+"error.hotkey.failed" = "Не удалось зарегистрировать сочетание %@.";
+"error.insert.target.gone" = "Приложение, куда шла диктовка, закрыто. Текст скопирован в буфер обмена.";
+
+/* Вставка текста */
+"insert.reason.clipboardMode" = "Текст скопирован в буфер обмена (режим «только буфер»). Нажмите Ctrl+V, чтобы вставить.";
+"insert.reason.targetGone" = "Исходное приложение недоступно. Текст скопирован в буфер обмена — вставьте его вручную (Ctrl+V).";
+"insert.reason.secureField" = "Активно защищённое поле (пароль). Текст скопирован в буфер обмена — вставьте вручную, если это уместно.";
+"insert.reason.pasteFailed" = "Приложение не приняло вставку. Текст скопирован в буфер обмена — нажмите Ctrl+V.";
+
+/* Оверлей */
+"overlay.esc" = "Esc — отмена";
+"overlay.level.ax" = "Уровень микрофона";
+
+/* Меню */
+"menu.status" = "Статус: %@";
+"menu.start" = "Начать диктовку";
+"menu.stop" = "Остановить и распознать";
+"menu.cancel" = "Отменить диктовку";
+"menu.settings" = "Настройки…";
+"menu.models" = "Открыть папку моделей";
+"menu.logs" = "Открыть журнал";
+"menu.quit" = "Завершить VoxLocal";
+
+/* Модели */
+"models.download.busy" = "Другая модель уже загружается.";
+
+/* Пресеты улучшения */
+"refine.preset.rawTranscript" = "Исходная расшифровка";
+"refine.preset.cleanDictation" = "Чистая диктовка";
+"refine.preset.concise" = "Кратко";
+"refine.preset.businessStyle" = "Деловой стиль";
+"refine.preset.preserveSpokenWording" = "Сохранить формулировки";
+"refine.preset.custom" = "Своя инструкция";
+"refine.fallback.notice" = "Улучшение недоступно — вставлен исходный текст распознавания.";
+
+/* Настройки */
+"settings.title" = "Настройки VoxLocal";
+"settings.tab.general" = "Основные";
+"settings.tab.transcription" = "Распознавание";
+"settings.tab.refinement" = "Улучшение";
+"settings.tab.privacy" = "Конфиденциальность";
+
+"settings.hotkey.section" = "Глобальное сочетание клавиш";
+"settings.hotkey" = "Сочетание";
+"settings.hotkey.press" = "Нажмите клавиши…";
+"settings.hotkey.mode" = "Режим";
+"settings.hotkey.mode.hold" = "Удерживать (запись, пока нажато)";
+"settings.hotkey.mode.toggle" = "Переключение (нажать — начать, нажать — остановить)";
+
+"settings.audio.section" = "Звук";
+"settings.mic" = "Микрофон";
+"settings.mic.default" = "Системный по умолчанию";
+
+"settings.insertion.section" = "Вставка текста";
+"settings.insertion" = "Способ";
+"settings.insertion.auto" = "Автоматически вставлять в активное приложение";
+"settings.insertion.clipboard" = "Только копировать в буфер обмена";
+
+"settings.app.section" = "Приложение";
+"settings.launchAtLogin" = "Запускать при входе в систему";
+"settings.launchAtLogin.error" = "Не удалось изменить автозапуск: %@";
+"settings.language.ui" = "Язык интерфейса";
+"settings.language.ui.ru" = "Русский";
+"settings.language.ui.en" = "English";
+"settings.language.ui.system" = "Как в системе";
+
+"settings.model.installed" = "Установленные модели";
+"settings.model.none" = "Модели ещё не установлены. Скачайте одну из списка ниже.";
+"settings.model" = "Активная модель";
+"settings.model.notInstalled" = "%@ (не установлена)";
+"settings.model.download" = "Загрузка моделей (Hugging Face, официальный репозиторий whisper.cpp)";
+"settings.model.englishOnly" = "только английский";
+"settings.model.installedAx" = "Установлена";
+"settings.model.get" = "Скачать…";
+"settings.model.confirm.title" = "Скачать модель?";
+"settings.model.confirm.download" = "Скачать (~%@)";
+"settings.model.confirm.message" = "Модель «%@» будет загружена с huggingface.co (официальный источник whisper.cpp). Размер около %@. Продолжить?";
+"settings.model.download.error" = "Ошибка загрузки: %@";
+
+"settings.recognition.section" = "Параметры распознавания";
+"settings.spoken" = "Язык речи";
+"settings.spoken.auto" = "Автоопределение";
+"settings.spoken.ru" = "Русский";
+"settings.spoken.en" = "Английский";
+"settings.threads" = "Потоков Whisper: %d";
+"settings.artifacts" = "Убирать артефакты распознавания ([музыка], [BLANK_AUDIO] и т. п.)";
+
+"settings.refine.enabled" = "Улучшать текст локальной LLM (Ollama)";
+"settings.refine.hint" = "Необязательно. Приложение полностью работает без Ollama: при недоступности сервера вставляется исходная расшифровка.";
+"settings.refine.ollama.section" = "Сервер Ollama (только localhost)";
+"settings.refine.endpoint" = "Адрес сервера";
+"settings.refine.model" = "Модель";
+"settings.refine.check" = "Проверить";
+"settings.refine.timeout" = "Тайм-аут";
+"settings.refine.preset.section" = "Стиль обработки";
+"settings.refine.preset" = "Пресет";
+"settings.refine.custom" = "Своя инструкция";
+"settings.refine.status.checking" = "Проверка…";
+"settings.refine.status.ok" = "Сервер и модель доступны ✓";
+"settings.refine.status.nomodel" = "Модель не найдена. Установлены: %@";
+"settings.refine.status.unreachable" = "Сервер недоступен: %@";
+"settings.refine.status.pickModel" = "Сервер доступен. Выберите модель: %@";
+"settings.refine.nonlocal" = "Адрес должен указывать на localhost (127.0.0.1). Внешние адреса запрещены ради конфиденциальности.";
+
+"settings.diagnostics.section" = "Диагностика";
+"settings.loglevel" = "Уровень журнала";
+"settings.loglevel.off" = "Выключен";
+"settings.loglevel.error" = "Только ош
