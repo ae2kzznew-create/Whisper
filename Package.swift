@@ -1,10 +1,10 @@
-// swift-tools-version:5.10
+// swift-tools-version:5.8
 import PackageDescription
 
 let package = Package(
     name: "VoxLocal",
     defaultLocalization: "ru",
-    platforms: [.macOS(.v14)],
+    platforms: [.macOS(.v13)],
     targets: [
         .target(
             name: "VoxLocalCore",

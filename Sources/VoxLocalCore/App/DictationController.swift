@@ -19,6 +19,13 @@ public final class DictationController: ObservableObject {
     /// inserting into another app (used by the onboarding test dictation).
     public var testModeSink: ((String) -> Void)?
 
+    /// Optional warm transcription server (keep-model-in-memory setting).
+    /// Any failure falls back to the whisper-cli path transparently.
+    public var warmTranscriber: WhisperServerTranscriber?
+
+    /// Optional GigaAM engine (Russian). Any failure falls back to Whisper.
+    public var gigaTranscriber: GigaAMTranscriber?
+
     /// Notifies UI layers (overlay window, status item) about state changes.
     public var onStateChange: ((DictationState) -> Void)?
 
@@ -200,7 +207,7 @@ public final class DictationController: ObservableObject {
             defer { try? FileManager.default.removeItem(at: recording.audioURL) }
             do {
                 let modelURL = try self.modelManager.resolveModel(named: modelName)
-                let transcript = try await self.transcriber.transcribe(
+                let transcript = try await self.transcribe(
                     audioURL: recording.audioURL,
                     modelURL: modelURL,
                     language: language,
@@ -231,6 +238,13 @@ public final class DictationController: ObservableObject {
                 }
 
                 guard self.machine.state == .transcribing || self.machine.state == .refining else { return }
+
+                // Journal before insertion, so the text survives even if
+                // insertion goes nowhere or the clipboard is overwritten.
+                if self.settings.historyEnabled, self.testModeSink == nil {
+                    DictationHistory.shared.append(finalText)
+                }
+
                 self.advance(to: .inserting)
 
                 if let sink = self.testModeSink {
@@ -260,6 +274,46 @@ public final class DictationController: ObservableObject {
                 self.fail(.transcriptionFailed(exitCode: -1, detail: error.localizedDescription))
             }
         }
+    }
+
+    /// Chooses the warm server when enabled and available; any warm-path
+    /// failure falls back to the one-shot whisper-cli run.
+    private func transcribe(
+        audioURL: URL,
+        modelURL: URL,
+        language: String,
+        threads: Int,
+        removeArtifacts: Bool
+    ) async throws -> WhisperTranscriber.Transcript {
+        if settings.engine == .gigaam, let giga = gigaTranscriber {
+            do {
+                try await giga.ensureRunning()
+                return try await giga.transcribe(audioURL: audioURL)
+            } catch is CancellationError {
+                throw CancellationError()
+            } catch {
+                Log.shared.info("gigaam unavailable (\(error)); falling back to Whisper")
+            }
+        }
+        if settings.keepModelWarm, let warm = warmTranscriber {
+            do {
+                try await warm.ensureRunning(modelURL: modelURL, threads: threads)
+                return try await warm.transcribe(
+                    audioURL: audioURL,
+                    language: language,
+                    removeArtifacts: removeArtifacts)
+            } catch is CancellationError {
+                throw CancellationError()
+            } catch {
+                Log.shared.info("warm server unavailable (\(error)); falling back to whisper-cli")
+            }
+        }
+        return try await transcriber.transcribe(
+            audioURL: audioURL,
+            modelURL: modelURL,
+            language: language,
+            threads: threads,
+            removeArtifacts: removeArtifacts)
     }
 
     /// Builds a fresh provider from current settings for each session, so

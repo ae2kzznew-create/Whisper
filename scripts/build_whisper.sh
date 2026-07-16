@@ -23,13 +23,17 @@ fi
   -DCMAKE_BUILD_TYPE=Release \
   -DBUILD_SHARED_LIBS=OFF \
   -DWHISPER_BUILD_TESTS=OFF \
-  -DWHISPER_BUILD_SERVER=OFF \
+  -DWHISPER_BUILD_SERVER=ON \
   -DWHISPER_BUILD_EXAMPLES=ON \
   "${METAL_FLAGS[@]}"
 
-"$CMAKE_BIN" --build "$WHISPER_DIR/build" --config Release --target whisper-cli -j "$(sysctl -n hw.ncpu)"
+"$CMAKE_BIN" --build "$WHISPER_DIR/build" --config Release --target whisper-cli --target whisper-server -j "$(sysctl -n hw.ncpu)"
 
 [[ -x "$WHISPER_CLI" ]] || die "build finished but $WHISPER_CLI is missing"
 log "whisper-cli built: $WHISPER_CLI"
 "$WHISPER_CLI" --help >/dev/null 2>&1 || die "whisper-cli does not run"
 log "whisper-cli smoke check passed"
+
+WHISPER_SERVER="$WHISPER_DIR/build/bin/whisper-server"
+[[ -x "$WHISPER_SERVER" ]] || die "build finished but $WHISPER_SERVER is missing"
+log "whisper-server built: $WHISPER_SERVER"

@@ -134,12 +134,15 @@ struct GeneralSettingsTab: View {
     }
 }
 
-/// Captures the next key press (with modifiers) via a local event monitor.
+/// Captures the next key press (with modifiers) via local event monitors.
+/// A lone modifier key (e.g. bare right ⌥) is captured too: press and
+/// release it without any other key in between.
 struct HotkeyRecorderView: View {
     let current: KeyCombo
     let onCapture: (KeyCombo) -> Void
     @State private var recording = false
-    @State private var monitor: Any?
+    @State private var monitors: [Any] = []
+    @State private var pendingModifier: UInt32?
 
     var body: some View {
         Button(recording ? L10n.t("settings.hotkey.press") : current.displayString) {
@@ -151,7 +154,8 @@ struct HotkeyRecorderView: View {
 
     private func startRecording() {
         recording = true
-        monitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown) { event in
+        pendingModifier = nil
+        if let keyMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown, handler: { event in
             defer { stopRecording() }
             if event.keyCode == 53 { // Esc cancels recording
                 return nil
@@ -159,15 +163,43 @@ struct HotkeyRecorderView: View {
             let combo = KeyCombo.fromNSEvent(keyCode: event.keyCode, flags: event.modifierFlags)
             onCapture(combo)
             return nil
+        }) {
+            monitors.append(keyMonitor)
+        }
+        if let flagsMonitor = NSEvent.addLocalMonitorForEvents(matching: .flagsChanged, handler: { event in
+            let keyCode = UInt32(event.keyCode)
+            let combo = KeyCombo(keyCode: keyCode, modifiers: 0)
+            guard combo.isModifierOnly else {
+                pendingModifier = nil
+                return event
+            }
+            let stillHeld = !event.modifierFlags
+                .intersection(HotkeyManager.deviceIndependentMask)
+                .isEmpty
+            if stillHeld {
+                // Modifier went down — candidate until another key arrives.
+                pendingModifier = keyCode
+                return event
+            }
+            if pendingModifier == keyCode {
+                onCapture(combo)
+                stopRecording()
+                return nil
+            }
+            pendingModifier = nil
+            return event
+        }) {
+            monitors.append(flagsMonitor)
         }
     }
 
     private func stopRecording() {
         recording = false
-        if let monitor {
+        pendingModifier = nil
+        for monitor in monitors {
             NSEvent.removeMonitor(monitor)
-            self.monitor = nil
         }
+        monitors.removeAll()
     }
 }
 
@@ -197,6 +229,21 @@ struct TranscriptionSettingsTab: View {
 
     var body: some View {
         Form {
+            Section(L10n.t("settings.engine.section")) {
+                Picker(L10n.t("settings.engine"), selection: $settings.engine) {
+                    Text(L10n.t("settings.engine.whisper")).tag(TranscriptionEngine.whisper)
+                    if GigaAMTranscriber.isAvailable {
+                        Text(L10n.t("settings.engine.gigaam")).tag(TranscriptionEngine.gigaam)
+                    }
+                }
+                .pickerStyle(.radioGroup)
+                if GigaAMTranscriber.isAvailable {
+                    Text(L10n.t("settings.engine.gigaam.hint"))
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             Section(L10n.t("settings.model.installed")) {
                 if modelManager.installedModels.isEmpty {
                     Text(L10n.t("settings.model.none"))
@@ -261,6 +308,10 @@ struct TranscriptionSettingsTab: View {
                     Text(L10n.t("settings.threads", settings.whisperThreads))
                 }
                 Toggle(L10n.t("settings.artifacts"), isOn: $settings.removeArtifacts)
+                Toggle(L10n.t("settings.keepWarm"), isOn: $settings.keepModelWarm)
+                Text(L10n.t("settings.keepWarm.hint"))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
             }
         }
         .formStyle(.grouped)
@@ -406,6 +457,16 @@ struct PrivacySettingsTab: View {
                 ForEach(1...5, id: \.self) { index in
                     Label(L10n.t("privacy.p\(index)"), systemImage: "checkmark.shield")
                         .font(.callout)
+                }
+            }
+            Section(L10n.t("settings.history.section")) {
+                Toggle(L10n.t("settings.history.enabled"), isOn: $settings.historyEnabled)
+                Text(L10n.t("settings.history.hint"))
+                    .font(.callout)
+                    .foregroundStyle(.secondary)
+                Button(L10n.t("settings.history.open")) {
+                    DictationHistory.shared.revealInEditor()
+                    NSWorkspace.shared.open(DictationHistory.shared.fileURL)
                 }
             }
             Section(L10n.t("settings.diagnostics.section")) {

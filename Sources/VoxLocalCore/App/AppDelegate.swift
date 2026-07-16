@@ -1,4 +1,5 @@
 import AppKit
+import Combine
 import SwiftUI
 
 /// Application entry object: builds the dependency graph, registers the
@@ -13,6 +14,10 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
     private var overlay: OverlayWindowController!
     private var statusItem: StatusItemController!
     private var deps: SettingsDependencies!
+
+    private var warmTranscriber: WhisperServerTranscriber!
+    private var gigaTranscriber: GigaAMTranscriber!
+    private var cancellables = Set<AnyCancellable>()
 
     private var settingsWindow: NSWindow?
     private var onboardingWindow: NSWindow?
@@ -39,6 +44,29 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
             modelManager: modelManager,
             inserter: TextInserter(),
             hotkeys: hotkeys)
+
+        warmTranscriber = WhisperServerTranscriber()
+        dictation.warmTranscriber = warmTranscriber
+        // Free the memory as soon as the warm-model setting is switched off.
+        settings.$keepModelWarm
+            .removeDuplicates()
+            .sink { [weak self] enabled in
+                if !enabled {
+                    self?.warmTranscriber?.stop()
+                }
+            }
+            .store(in: &cancellables)
+
+        gigaTranscriber = GigaAMTranscriber()
+        dictation.gigaTranscriber = gigaTranscriber
+        settings.$engine
+            .removeDuplicates()
+            .sink { [weak self] engine in
+                if engine != .gigaam {
+                    self?.gigaTranscriber?.stop()
+                }
+            }
+            .store(in: &cancellables)
 
         overlay = OverlayWindowController(dictation: dictation)
 
@@ -72,6 +100,8 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
 
     public func applicationWillTerminate(_ notification: Notification) {
         dictation?.cancelDictation()
+        warmTranscriber?.stop()
+        gigaTranscriber?.stop()
         hotkeys?.unregisterMainHotkey()
         hotkeys?.unregisterEscape()
         Log.shared.info("VoxLocal terminating")

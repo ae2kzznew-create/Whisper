@@ -15,6 +15,14 @@ public enum InsertionMode: String, CaseIterable, Sendable {
     case clipboardOnly
 }
 
+public enum TranscriptionEngine: String, CaseIterable, Sendable {
+    /// whisper.cpp (all languages) — the bundled default.
+    case whisper
+    /// GigaAM v3 (Russian only) via a detected local runtime; falls back
+    /// to Whisper when unavailable.
+    case gigaam
+}
+
 public enum SpokenLanguage: String, CaseIterable, Sendable {
     case auto
     case russian = "ru"
@@ -38,6 +46,9 @@ public final class SettingsStore: ObservableObject {
         static let spokenLanguage = "whisper.language"
         static let whisperThreads = "whisper.threads"
         static let removeArtifacts = "whisper.removeArtifacts"
+        static let keepModelWarm = "whisper.keepWarm"
+        static let engine = "engine"
+        static let historyEnabled = "history.enabled"
         static let refinementEnabled = "refine.enabled"
         static let ollamaEndpoint = "refine.ollamaEndpoint"
         static let ollamaModel = "refine.ollamaModel"
@@ -67,6 +78,9 @@ public final class SettingsStore: ObservableObject {
         whisperThreads = defaults.object(forKey: Key.whisperThreads) as? Int
             ?? min(8, max(2, ProcessInfo.processInfo.activeProcessorCount / 2))
         removeArtifacts = defaults.object(forKey: Key.removeArtifacts) as? Bool ?? true
+        keepModelWarm = defaults.object(forKey: Key.keepModelWarm) as? Bool ?? false
+        engine = TranscriptionEngine(rawValue: defaults.string(forKey: Key.engine) ?? "") ?? .whisper
+        historyEnabled = defaults.object(forKey: Key.historyEnabled) as? Bool ?? false
         refinementEnabled = defaults.object(forKey: Key.refinementEnabled) as? Bool ?? false
         ollamaEndpoint = defaults.string(forKey: Key.ollamaEndpoint) ?? Self.defaultOllamaEndpoint
         ollamaModel = defaults.string(forKey: Key.ollamaModel) ?? ""
@@ -103,6 +117,15 @@ public final class SettingsStore: ObservableObject {
     }
     @Published public var removeArtifacts: Bool {
         didSet { defaults.set(removeArtifacts, forKey: Key.removeArtifacts) }
+    }
+    @Published public var keepModelWarm: Bool {
+        didSet { defaults.set(keepModelWarm, forKey: Key.keepModelWarm) }
+    }
+    @Published public var engine: TranscriptionEngine {
+        didSet { defaults.set(engine.rawValue, forKey: Key.engine) }
+    }
+    @Published public var historyEnabled: Bool {
+        didSet { defaults.set(historyEnabled, forKey: Key.historyEnabled) }
     }
     @Published public var refinementEnabled: Bool {
         didSet { defaults.set(refinementEnabled, forKey: Key.refinementEnabled) }

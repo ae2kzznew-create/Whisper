@@ -21,6 +21,23 @@ public struct KeyCombo: Equatable, Codable, Sendable {
     /// Default: ⌥Space.
     public static let `default` = KeyCombo(keyCode: 49, modifiers: carbonOption)
 
+    /// Modifier keys usable as a standalone hotkey (no other key involved).
+    /// keyCode → (display symbol, is the right-hand variant).
+    static let modifierKeySymbols: [UInt32: (symbol: String, right: Bool)] = [
+        55: ("⌘", false), 54: ("⌘", true),
+        58: ("⌥", false), 61: ("⌥", true),
+        59: ("⌃", false), 62: ("⌃", true),
+        56: ("⇧", false), 60: ("⇧", true),
+        63: ("fn", false),
+    ]
+
+    /// True when the combo is a single modifier key (e.g. right ⌥) acting as
+    /// the hotkey itself. Carbon can't register these; HotkeyManager watches
+    /// flagsChanged events instead.
+    public var isModifierOnly: Bool {
+        modifiers == 0 && Self.modifierKeySymbols[keyCode] != nil
+    }
+
     public static func fromNSEvent(keyCode: UInt16, flags: NSEvent.ModifierFlags) -> KeyCombo {
         var mods: UInt32 = 0
         if flags.contains(.command) { mods |= carbonCmd }
@@ -48,6 +65,11 @@ public struct KeyCombo: Equatable, Codable, Sendable {
     ]
 
     public static func keyName(for keyCode: UInt32) -> String {
+        if let modifier = modifierKeySymbols[keyCode] {
+            return modifier.right
+                ? L10n.t("key.right", modifier.symbol)
+                : modifier.symbol
+        }
         if let special = specialKeyNames[keyCode] {
             return special
         }

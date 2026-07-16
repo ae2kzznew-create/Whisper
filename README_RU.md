@@ -25,7 +25,7 @@ English version: [README.md](README.md)
 
 ## Требования
 
-- macOS **14+** (собрано и проверено на macOS 26, Apple Silicon).
+- macOS **14+** (собрано и проверено на macOS 26, Apple Silicon); **macOS 13** — через запасную сборку ниже.
 - Рекомендуется Apple Silicon (ускорение Metal). На Intel соберётся без Metal.
 - Xcode **Command Line Tools** (или полный Xcode) для сборки.
 - Диск: ~500 МБ на артефакты сборки + модель (base ≈ 148 МБ, small ≈ 488 МБ, large-v3 ≈ 3,1 ГБ).
@@ -45,6 +45,23 @@ git clone https://github.com/romarayt/VoxLocal.git && cd VoxLocal
 ```
 
 Homebrew, CocoaPods и другие глобальные менеджеры пакетов **не требуются** — всё проектно-локально (`vendor/`).
+
+### Intel Mac / macOS 13 (запасная сборка)
+
+На старых машинах с одними Command Line Tools (без полного Xcode) SwiftPM может быть
+сломан (`xcrun: unable to lookup item 'PlatformPath'` — известная проблема CLT 14.x).
+Вместо `test.sh`/`build_app.sh` используйте прямую сборку swiftc:
+
+```bash
+./scripts/bootstrap.sh
+./scripts/download_model.sh base
+./scripts/build_app_direct.sh   # компиляция swiftc без SwiftPM; минимум macOS 13
+./scripts/run.sh
+```
+
+Проверено на Intel iMac, macOS 13.7, Swift 5.8 (CLT 14.3): собирается, распознаёт
+русский и английский (модель base, ~3 с на короткую фразу, без Metal). `swift test`
+там недоступен — в CLT нет XCTest.
 
 ## Первый запуск (разрешения)
 
