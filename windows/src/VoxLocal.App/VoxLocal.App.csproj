@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <!-- NotifyIcon (трей) живёт в WinForms -->
+    <UseWindowsForms>true</UseWindowsForms>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>VoxLocal.App</RootNamespace>
+    <AssemblyName>VoxLocal</AssemblyName>
+    <ApplicationIcon>Icons\mic.ico</ApplicationIcon>
+    <StartupObject>VoxLocal.App.Program</StartupObject>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- Захват звука WASAPI (модуль Audio) -->
+    <PackageReference Include="NAudio" Version="2.2.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Оригинальные таблицы локализации переносятся как есть -->
+    <EmbeddedResource Include="Resources\ru\Localizable.strings"
+                      LogicalName="VoxLocal.Core.Resources.ru.Localizable.strings" />
+    <EmbeddedResource Include="Resources\en\Localizable.strings"
+                      LogicalName="VoxLocal.Core.Resources.en.Localizable.strings" />
+    <EmbeddedResource Include="Icons\*.ico"
+                      LogicalName="VoxLocal.App.Icons.%(Filename)%(Extension)" />
+  </ItemGroup>
+</Project>
