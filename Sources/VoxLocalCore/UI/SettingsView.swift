@@ -229,6 +229,21 @@ struct TranscriptionSettingsTab: View {
 
     var body: some View {
         Form {
+            Section(L10n.t("settings.engine.section")) {
+                Picker(L10n.t("settings.engine"), selection: $settings.engine) {
+                    Text(L10n.t("settings.engine.whisper")).tag(TranscriptionEngine.whisper)
+                    if GigaAMTranscriber.isAvailable {
+                        Text(L10n.t("settings.engine.gigaam")).tag(TranscriptionEngine.gigaam)
+                    }
+                }
+                .pickerStyle(.radioGroup)
+                if GigaAMTranscriber.isAvailable {
+                    Text(L10n.t("settings.engine.gigaam.hint"))
+                        .font(.callout)
+                        .foregroundStyle(.secondary)
+                }
+            }
+
             Section(L10n.t("settings.model.installed")) {
                 if modelManager.installedModels.isEmpty {
                     Text(L10n.t("settings.model.none"))

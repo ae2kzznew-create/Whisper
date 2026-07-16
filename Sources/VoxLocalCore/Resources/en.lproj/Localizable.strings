@@ -211,3 +211,9 @@
 "settings.history.hint" = "The journal is stored only on this Mac. Audio is still never saved.";
 "settings.history.open" = "Open journal";
 "insert.reason.noFocusedField" = "No text field found — the text is on the clipboard, paste with ⌘V.";
+
+"settings.engine.section" = "Recognition engine";
+"settings.engine" = "Engine";
+"settings.engine.whisper" = "Whisper (all languages)";
+"settings.engine.gigaam" = "GigaAM v3 (Russian — more accurate and faster)";
+"settings.engine.gigaam.hint" = "GigaAM recognizes Russian only. Runs locally; Whisper is used automatically when it is unavailable.";

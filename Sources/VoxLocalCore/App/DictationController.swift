@@ -23,6 +23,9 @@ public final class DictationController: ObservableObject {
     /// Any failure falls back to the whisper-cli path transparently.
     public var warmTranscriber: WhisperServerTranscriber?
 
+    /// Optional GigaAM engine (Russian). Any failure falls back to Whisper.
+    public var gigaTranscriber: GigaAMTranscriber?
+
     /// Notifies UI layers (overlay window, status item) about state changes.
     public var onStateChange: ((DictationState) -> Void)?
 
@@ -282,6 +285,16 @@ public final class DictationController: ObservableObject {
         threads: Int,
         removeArtifacts: Bool
     ) async throws -> WhisperTranscriber.Transcript {
+        if settings.engine == .gigaam, let giga = gigaTranscriber {
+            do {
+                try await giga.ensureRunning()
+                return try await giga.transcribe(audioURL: audioURL)
+            } catch is CancellationError {
+                throw CancellationError()
+            } catch {
+                Log.shared.info("gigaam unavailable (\(error)); falling back to Whisper")
+            }
+        }
         if settings.keepModelWarm, let warm = warmTranscriber {
             do {
                 try await warm.ensureRunning(modelURL: modelURL, threads: threads)

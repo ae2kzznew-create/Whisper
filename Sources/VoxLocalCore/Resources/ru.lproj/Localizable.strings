@@ -211,3 +211,9 @@
 "settings.history.hint" = "Журнал хранится только на этом Mac. Аудио по-прежнему никогда не сохраняется.";
 "settings.history.open" = "Открыть журнал";
 "insert.reason.noFocusedField" = "Не нашёл текстовое поле — текст в буфере обмена, вставьте через ⌘V.";
+
+"settings.engine.section" = "Движок распознавания";
+"settings.engine" = "Движок";
+"settings.engine.whisper" = "Whisper (все языки)";
+"settings.engine.gigaam" = "GigaAM v3 (русский — точнее и быстрее)";
+"settings.engine.gigaam.hint" = "GigaAM распознаёт только русский. Работает локально; если движок недоступен, автоматически используется Whisper.";

@@ -16,6 +16,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
     private var deps: SettingsDependencies!
 
     private var warmTranscriber: WhisperServerTranscriber!
+    private var gigaTranscriber: GigaAMTranscriber!
     private var cancellables = Set<AnyCancellable>()
 
     private var settingsWindow: NSWindow?
@@ -56,6 +57,17 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
             }
             .store(in: &cancellables)
 
+        gigaTranscriber = GigaAMTranscriber()
+        dictation.gigaTranscriber = gigaTranscriber
+        settings.$engine
+            .removeDuplicates()
+            .sink { [weak self] engine in
+                if engine != .gigaam {
+                    self?.gigaTranscriber?.stop()
+                }
+            }
+            .store(in: &cancellables)
+
         overlay = OverlayWindowController(dictation: dictation)
 
         deps = SettingsDependencies(
@@ -89,6 +101,7 @@ public final class AppDelegate: NSObject, NSApplicationDelegate {
     public func applicationWillTerminate(_ notification: Notification) {
         dictation?.cancelDictation()
         warmTranscriber?.stop()
+        gigaTranscriber?.stop()
         hotkeys?.unregisterMainHotkey()
         hotkeys?.unregisterEscape()
         Log.shared.info("VoxLocal terminating")
