@@ -1,5 +1,5 @@
 /* Общие */
-"app.name" = "VoxLocal";
+"app.name" = "Voice2kzz";
 "common.ok" = "ОК";
 "common.cancel" = "Отмена";
 
@@ -49,7 +49,7 @@
 "menu.settings" = "Настройки…";
 "menu.models" = "Открыть папку моделей";
 "menu.logs" = "Открыть журнал";
-"menu.quit" = "Завершить VoxLocal";
+"menu.quit" = "Завершить Voice2kzz";
 
 /* Модели */
 "models.download.busy" = "Другая модель уже загружается.";
@@ -64,7 +64,7 @@
 "refine.fallback.notice" = "Улучшение недоступно — вставлен исходный текст распознавания.";
 
 /* Настройки */
-"settings.title" = "Настройки VoxLocal";
+"settings.title" = "Настройки Voice2kzz";
 "settings.tab.general" = "Основные";
 "settings.tab.transcription" = "Распознавание";
 "settings.tab.refinement" = "Улучшение";
@@ -141,7 +141,7 @@
 "settings.resetOnboarding" = "Показать приветственную настройку заново";
 
 /* Конфиденциальность */
-"privacy.title" = "Как VoxLocal обращается с данными";
+"privacy.title" = "Как Voice2kzz обращается с данными";
 "privacy.p1" = "Звук обрабатывается только на этом ПК — распознавание выполняет локальный whisper.cpp.";
 "privacy.p2" = "Облачные API не используются и не требуются. Ключи API не нужны.";
 "privacy.p3" = "Временная аудиозапись удаляется сразу после распознавания, отмены или ошибки.";
@@ -150,8 +150,8 @@
 "privacy.logs" = "Журнал не содержит аудио, текстов диктовок и содержимого буфера обмена; пути к файлам сокращаются. Размер журнала ограничен.";
 
 /* Онбординг */
-"onboarding.title" = "Добро пожаловать в VoxLocal";
-"onboarding.welcome.title" = "VoxLocal — локальная диктовка";
+"onboarding.title" = "Добро пожаловать в Voice2kzz";
+"onboarding.welcome.title" = "Voice2kzz — локальная диктовка";
 "onboarding.welcome.text" = "Нажмите сочетание клавиш, продиктуйте текст — он появится в активном приложении. Всё распознавание происходит на вашем ПК.";
 "onboarding.welcome.point1" = "Работает в любом приложении";
 "onboarding.welcome.point2" = "Распознавание полностью офлайн (whisper.cpp)";
@@ -171,7 +171,7 @@
 "onboarding.model.recommended" = "%@ (рекомендуется)";
 "onboarding.model.more" = "Другие модели (small, medium, large-v3) доступны в Настройках → Распознавание.";
 "onboarding.ollama.title" = "Ollama (необязательно)";
-"onboarding.ollama.text" = "Если установлен Ollama (ollama.com), VoxLocal может исправлять пунктуацию и убирать слова-паразиты локальной LLM. Это не обязательно: без Ollama вставляется исходная расшифровка.";
+"onboarding.ollama.text" = "Если установлен Ollama (ollama.com), Voice2kzz может исправлять пунктуацию и убирать слова-паразиты локальной LLM. Это не обязательно: без Ollama вставляется исходная расшифровка.";
 "onboarding.ollama.optional" = "Шаг можно пропустить и включить улучшение позже в Настройках.";
 "onboarding.ollama.noModels" = "Сервер доступен, но модели не установлены. Выполните: ollama pull qwen2.5:3b";
 "onboarding.ollama.found" = "Ollama доступен. Модели: %@";
@@ -185,7 +185,7 @@
 "onboarding.test.stop" = "Остановить";
 "onboarding.test.result" = "Распознанный текст";
 "onboarding.done.title" = "Всё готово";
-"onboarding.done.text" = "VoxLocal живёт в области уведомлений (значок микрофона в трее). Нажмите сочетание клавиш в любом приложении и диктуйте. Настройки всегда доступны из меню трея.";
+"onboarding.done.text" = "Voice2kzz живёт в области уведомлений (значок микрофона в трее). Нажмите сочетание клавиш в любом приложении и диктуйте. Настройки всегда доступны из меню трея.";
 "onboarding.status.granted" = "Разрешено";
 "onboarding.status.denied" = "Нет доступа";
 "onboarding.status.notdetermined" = "Ещё не запрашивалось";

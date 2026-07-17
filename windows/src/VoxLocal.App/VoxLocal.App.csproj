@@ -8,7 +8,9 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>VoxLocal.App</RootNamespace>
-    <AssemblyName>VoxLocal</AssemblyName>
+    <!-- Пользовательское имя бренда: exe называется Voice2kzz.exe.
+         Внутренние пространства имён остаются VoxLocal.* (техническое имя проекта). -->
+    <AssemblyName>Voice2kzz</AssemblyName>
     <!-- Иконка exe подключается, только если файл существует; без неё сборка проходит -->
     <ApplicationIcon Condition="Exists('Icons\mic.ico')">Icons\mic.ico</ApplicationIcon>
     <StartupObject>VoxLocal.App.Program</StartupObject>

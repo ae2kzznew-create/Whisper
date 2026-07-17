@@ -1,5 +1,5 @@
 /* Common */
-"app.name" = "VoxLocal";
+"app.name" = "Voice2kzz";
 "common.ok" = "OK";
 "common.cancel" = "Cancel";
 
@@ -49,7 +49,7 @@
 "menu.settings" = "Settings…";
 "menu.models" = "Open Model Folder";
 "menu.logs" = "Open Logs";
-"menu.quit" = "Quit VoxLocal";
+"menu.quit" = "Quit Voice2kzz";
 
 /* Models */
 "models.download.busy" = "Another model is already downloading.";
@@ -64,7 +64,7 @@
 "refine.fallback.notice" = "Refinement unavailable — the raw transcript was inserted.";
 
 /* Settings */
-"settings.title" = "VoxLocal Settings";
+"settings.title" = "Voice2kzz Settings";
 "settings.tab.general" = "General";
 "settings.tab.transcription" = "Transcription";
 "settings.tab.refinement" = "Refinement";
@@ -141,7 +141,7 @@
 "settings.resetOnboarding" = "Show the welcome setup again";
 
 /* Privacy */
-"privacy.title" = "How VoxLocal handles your data";
+"privacy.title" = "How Voice2kzz handles your data";
 "privacy.p1" = "Audio is processed only on this PC — recognition runs on local whisper.cpp.";
 "privacy.p2" = "No cloud APIs are used or required. No API keys needed.";
 "privacy.p3" = "The temporary audio recording is deleted right after transcription, cancellation or an error.";
@@ -150,8 +150,8 @@
 "privacy.logs" = "Logs contain no audio, no dictated text and no clipboard contents; file paths are shortened. Log size is bounded.";
 
 /* Onboarding */
-"onboarding.title" = "Welcome to VoxLocal";
-"onboarding.welcome.title" = "VoxLocal — local dictation";
+"onboarding.title" = "Welcome to Voice2kzz";
+"onboarding.welcome.title" = "Voice2kzz — local dictation";
 "onboarding.welcome.text" = "Press the shortcut, dictate, and the text appears in the active application. All recognition happens on your PC.";
 "onboarding.welcome.point1" = "Works in any application";
 "onboarding.welcome.point2" = "Fully offline recognition (whisper.cpp)";
@@ -171,7 +171,7 @@
 "onboarding.model.recommended" = "%@ (recommended)";
 "onboarding.model.more" = "More models (small, medium, large-v3) are available in Settings → Transcription.";
 "onboarding.ollama.title" = "Ollama (optional)";
-"onboarding.ollama.text" = "If Ollama (ollama.com) is installed, VoxLocal can fix punctuation and remove filler words with a local LLM. It is optional: without Ollama the raw transcript is inserted.";
+"onboarding.ollama.text" = "If Ollama (ollama.com) is installed, Voice2kzz can fix punctuation and remove filler words with a local LLM. It is optional: without Ollama the raw transcript is inserted.";
 "onboarding.ollama.optional" = "You can skip this step and enable refinement later in Settings.";
 "onboarding.ollama.noModels" = "The server is up but no models are installed. Run: ollama pull qwen2.5:3b";
 "onboarding.ollama.found" = "Ollama is available. Models: %@";
@@ -185,7 +185,7 @@
 "onboarding.test.stop" = "Stop";
 "onboarding.test.result" = "Recognized text";
 "onboarding.done.title" = "All set";
-"onboarding.done.text" = "VoxLocal lives in the system tray (microphone icon). Press the shortcut in any app and dictate. Settings are always available from the tray menu.";
+"onboarding.done.text" = "Voice2kzz lives in the system tray (microphone icon). Press the shortcut in any app and dictate. Settings are always available from the tray menu.";
 "onboarding.status.granted" = "Granted";
 "onboarding.status.denied" = "Not granted";
 "onboarding.status.notdetermined" = "Not requested yet";
