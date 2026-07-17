@@ -45,7 +45,9 @@
                       LogicalName="VoxLocal.App.Icons.%(Filename)%(Extension)" />
   </ItemGroup>
   <ItemGroup>
-    <!-- Движок распознавания: содержимое tools/ копируется в выходную папку рядом с exe -->
-    <None Include="tools\**" CopyToOutputDirectory="PreserveNewest" />
+    <!-- Движок распознавания: содержимое tools/ копируется в выходную папку рядом с exe.
+         ExcludeFromSingleFile: при однофайловой публикации эти файлы должны остаться
+         снаружи exe: whisper-cli.exe — отдельная программа и ищет свои dll рядом с собой. -->
+    <None Include="tools\**" CopyToOutputDirectory="PreserveNewest" ExcludeFromSingleFile="true" />
   </ItemGroup>
 </Project>
