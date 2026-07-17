@@ -40,6 +40,10 @@ public partial class App : Application
         var version = typeof(App).Assembly.GetName().Version?.ToString(3) ?? "dev";
         Log.Shared.Info($"VoxLocal starting (v{version})");
 
+        // Normal sessions delete their temp WAV themselves; this sweep only
+        // catches leftovers from crashes or power loss.
+        CleanupOrphanedTempAudio();
+
         _permissions = new PermissionsService();
         _modelManager = new ModelManager();
         _hotkeys = new HotkeyManager();
@@ -103,6 +107,44 @@ public partial class App : Application
         Log.Shared.Info("VoxLocal terminating");
         Log.Shared.Sync();
         base.OnExit(e);
+    }
+
+    /// <summary>
+    /// Deletes voxlocal-*.wav files left in %TEMP% by sessions that were
+    /// interrupted abnormally (crash, power loss). Only files older than one
+    /// hour are removed, so a recording from another live instance is never
+    /// touched. No transcript text is ever written to disk, so temp audio is
+    /// the only per-session artifact to clean up.
+    /// </summary>
+    private static void CleanupOrphanedTempAudio()
+    {
+        try
+        {
+            var cutoff = DateTime.UtcNow.AddHours(-1);
+            foreach (var file in System.IO.Directory.EnumerateFiles(Path.GetTempPath(), "voxlocal-*.wav"))
+            {
+                try
+                {
+                    if (File.GetLastWriteTimeUtc(file) < cutoff)
+                    {
+                        File.Delete(file);
+                        Log.Shared.Info("removed orphaned temp audio file");
+                    }
+                }
+                catch (IOException)
+                {
+                    // in use or already gone — skip
+                }
+                catch (UnauthorizedAccessException)
+                {
+                    // not ours to delete — skip
+                }
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Shared.Error($"temp audio cleanup failed: {e.Message}");
+        }
     }
 
     /// <summary>Registers the shortcut; returns a localized error message on
