@@ -36,6 +36,7 @@
 "insert.reason.targetGone" = "The original app is unavailable. The text was copied to the clipboard — paste it manually (Ctrl+V).";
 "insert.reason.secureField" = "A secure (password) field is focused. The text was copied to the clipboard — paste manually if appropriate.";
 "insert.reason.pasteFailed" = "The app rejected the paste. The text was copied to the clipboard — press Ctrl+V.";
+"insert.reason.elevated" = "That app runs as administrator — Windows blocks synthetic input into it from normal apps. The text was copied to the clipboard — press Ctrl+V. Tip: run Voice2kzz as administrator too and insertion will work.";
 
 /* Overlay */
 "overlay.esc" = "Esc — cancel";
