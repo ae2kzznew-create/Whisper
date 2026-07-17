@@ -21,9 +21,14 @@ public sealed class WhisperTranscriber
     /// <summary>
     /// Candidate locations for whisper-cli.exe, in priority order:
     /// 1. VOXLOCAL_WHISPER_CLI environment variable (tests, development),
-    /// 2. next to the application executable (packaged app),
-    /// 3. the tools/ subfolder next to the executable (packaged app layout),
-    /// 4. the in-repo CMake build output (running from the repo).
+    /// 2. the tools/ subfolder next to the real executable (packaged app layout),
+    /// 3. next to the real executable,
+    /// 4. the same two locations relative to AppContext.BaseDirectory,
+    /// 5. the in-repo CMake build output (running from the repo).
+    /// In a single-file publish AppContext.BaseDirectory can point to the
+    /// bundle extraction directory (%TEMP%\.net\...), not the folder that
+    /// contains the exe, so Environment.ProcessPath is the reliable anchor
+    /// for the packaged tools/ layout.
     /// </summary>
     public static IReadOnlyList<string> BinaryCandidates()
     {
@@ -33,12 +38,18 @@ public sealed class WhisperTranscriber
         {
             candidates.Add(env);
         }
-        candidates.Add(Path.Combine(AppContext.BaseDirectory, "whisper-cli.exe"));
+        var exeDir = Path.GetDirectoryName(Environment.ProcessPath);
+        if (!string.IsNullOrEmpty(exeDir))
+        {
+            candidates.Add(Path.Combine(exeDir, "tools", "whisper-cli.exe"));
+            candidates.Add(Path.Combine(exeDir, "whisper-cli.exe"));
+        }
         candidates.Add(Path.Combine(AppContext.BaseDirectory, "tools", "whisper-cli.exe"));
+        candidates.Add(Path.Combine(AppContext.BaseDirectory, "whisper-cli.exe"));
         var cwd = Directory.GetCurrentDirectory();
         candidates.Add(Path.Combine(cwd, "vendor", "whisper.cpp", "build", "bin", "Release", "whisper-cli.exe"));
         candidates.Add(Path.Combine(cwd, "vendor", "whisper.cpp", "build", "bin", "whisper-cli.exe"));
-        return candidates;
+        return candidates.Distinct(StringComparer.OrdinalIgnoreCase).ToList();
     }
 
     public string LocateBinary()

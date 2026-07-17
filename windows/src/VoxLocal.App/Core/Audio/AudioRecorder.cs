@@ -141,10 +141,16 @@ public sealed class AudioRecorder
         }
     }
 
-    /// <summary>Same heuristic as the macOS version: sampled RMS × 18, clamped to 1.</summary>
+    /// <summary>
+    /// Perceptual meter level: sampled RMS mapped through a decibel curve
+    /// (-50 dB … -8 dB → 0 … 1). Normal conversational speech lands around
+    /// the middle of the meter instead of barely lighting two bars — the old
+    /// linear "RMS × 18" heuristic required shouting to move the meter.
+    /// </summary>
     private static float ComputeLevel(byte[] buffer, int bytes, WaveFormat format)
     {
         var step = 16 * format.Channels; // sample every 16th frame; enough for a meter
+        float rms;
         if (format.Encoding == WaveFormatEncoding.IeeeFloat && bytes >= 4)
         {
             var floats = MemoryMarshal.Cast<byte, float>(buffer.AsSpan(0, bytes));
@@ -155,9 +161,9 @@ public sealed class AudioRecorder
                 sum += floats[i] * floats[i];
                 counted++;
             }
-            return Math.Min(1.0f, MathF.Sqrt(sum / Math.Max(1, counted)) * 18);
+            rms = MathF.Sqrt(sum / Math.Max(1, counted));
         }
-        if (format.Encoding == WaveFormatEncoding.Pcm && format.BitsPerSample == 16 && bytes >= 2)
+        else if (format.Encoding == WaveFormatEncoding.Pcm && format.BitsPerSample == 16 && bytes >= 2)
         {
             var shorts = MemoryMarshal.Cast<byte, short>(buffer.AsSpan(0, bytes));
             float sum = 0;
@@ -168,9 +174,19 @@ public sealed class AudioRecorder
                 sum += v * v;
                 counted++;
             }
-            return Math.Min(1.0f, MathF.Sqrt(sum / Math.Max(1, counted)) * 18);
+            rms = MathF.Sqrt(sum / Math.Max(1, counted));
         }
-        return 0;
+        else
+        {
+            return 0;
+        }
+
+        if (rms <= 0.0001f)
+        {
+            return 0;
+        }
+        var db = 20f * MathF.Log10(rms);
+        return Math.Clamp((db + 50f) / 42f, 0f, 1f);
     }
 
     private void OnRecordingStopped(object? sender, StoppedEventArgs e)
