@@ -32,6 +32,18 @@ public sealed record KeyCombo(
         return new KeyCombo(virtualKey, mods);
     }
 
+    /// <summary>Builds a combo from WPF key-event data (settings hotkey recorder).</summary>
+    public static KeyCombo FromWpf(System.Windows.Input.Key key, System.Windows.Input.ModifierKeys modifiers)
+    {
+        var virtualKey = (uint)System.Windows.Input.KeyInterop.VirtualKeyFromKey(key);
+        return FromKeyEvent(
+            virtualKey,
+            ctrl: (modifiers & System.Windows.Input.ModifierKeys.Control) != 0,
+            shift: (modifiers & System.Windows.Input.ModifierKeys.Shift) != 0,
+            alt: (modifiers & System.Windows.Input.ModifierKeys.Alt) != 0,
+            win: (modifiers & System.Windows.Input.ModifierKeys.Windows) != 0);
+    }
+
     public string DisplayString
     {
         get

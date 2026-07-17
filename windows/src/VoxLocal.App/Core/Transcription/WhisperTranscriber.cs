@@ -55,6 +55,21 @@ public sealed class WhisperTranscriber
         throw new VoxLocalException(new VoxLocalError.WhisperBinaryMissing(searched));
     }
 
+    /// <summary>Non-throwing variant of <see cref="LocateBinary"/> for status screens (onboarding).</summary>
+    public bool TryLocateBinary(out string? path)
+    {
+        try
+        {
+            path = LocateBinary();
+            return true;
+        }
+        catch (VoxLocalException)
+        {
+            path = null;
+            return false;
+        }
+    }
+
     public async Task<Transcript> TranscribeAsync(
         string audioPath,
         string modelPath,

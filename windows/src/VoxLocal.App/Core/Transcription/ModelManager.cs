@@ -24,10 +24,15 @@ public sealed class ModelManager : INotifyPropertyChanged
     private double? _downloadProgress;
     private string? _downloadingModel;
     private CancellationTokenSource? _downloadCts;
+    private readonly SynchronizationContext? _ownerContext = SynchronizationContext.Current;
 
     public string ModelsDirectory { get; }
 
     public event PropertyChangedEventHandler? PropertyChanged;
+
+    /// <summary>Raised after the installed models list is rescanned (marshalled
+    /// to the owner's synchronization context when one was present at construction).</summary>
+    public event Action? ModelsChanged;
 
     public ModelManager(string? modelsDirectory = null)
     {
@@ -41,7 +46,7 @@ public sealed class ModelManager : INotifyPropertyChanged
     public IReadOnlyList<InstalledModel> InstalledModels
     {
         get => _installedModels;
-        private set { _installedModels = value; OnPropertyChanged(); }
+        private set { _installedModels = value; OnPropertyChanged(); RaiseModelsChanged(); }
     }
 
     public double? DownloadProgress
@@ -186,6 +191,19 @@ public sealed class ModelManager : INotifyPropertyChanged
     }
 
     public void CancelDownload() => _downloadCts?.Cancel();
+
+    private void RaiseModelsChanged()
+    {
+        var context = _ownerContext;
+        if (context is not null && !ReferenceEquals(SynchronizationContext.Current, context))
+        {
+            context.Post(_ => ModelsChanged?.Invoke(), null);
+        }
+        else
+        {
+            ModelsChanged?.Invoke();
+        }
+    }
 
     private void OnPropertyChanged([CallerMemberName] string? name = null) =>
         PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(name));

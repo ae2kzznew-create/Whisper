@@ -300,7 +300,7 @@ public sealed class DictationController : INotifyPropertyChanged
             {
                 var modelPath = _modelManager.ResolveModel(modelName);
                 var transcript = await _transcriber.TranscribeAsync(
-                    recording.AudioPath, modelPath, language, threads, removeArtifacts, ct);
+                    recording.AudioPath, modelPath, language, threads, removeArtifacts, cancellationToken: ct);
                 ct.ThrowIfCancellationRequested();
 
                 if (string.IsNullOrEmpty(transcript.Text))
