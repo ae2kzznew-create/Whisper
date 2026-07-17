@@ -14,6 +14,23 @@
     <StartupObject>VoxLocal.App.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
+    <!-- WPF + WinForms в одном проекте: убираем неявные глобальные using
+         System.Windows.Forms и System.Drawing, иначе они конфликтуют с
+         WPF-типами (Button, ComboBox, Application, Brush и т.д.).
+         Код трея (TrayIconController) использует явные using и полные имена.
+         Базовый набор глобальных using задаём явно, чтобы он гарантированно
+         действовал независимо от комбинации SDK-настроек. -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+    <Using Include="System" />
+    <Using Include="System.Collections.Generic" />
+    <Using Include="System.IO" />
+    <Using Include="System.Linq" />
+    <Using Include="System.Net.Http" />
+    <Using Include="System.Threading" />
+    <Using Include="System.Threading.Tasks" />
+  </ItemGroup>
+  <ItemGroup>
     <!-- Захват звука WASAPI (модуль Audio) -->
     <PackageReference Include="NAudio" Version="2.2.1" />
   </ItemGroup>
