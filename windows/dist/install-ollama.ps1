@@ -63,4 +63,29 @@ if (-not $ollamaCmd) {
 
     # Шаг 2: тихая установка, без окон и вопросов.
     $p = Start-Process -FilePath $setup -ArgumentList '/VERYSILENT', '/NORESTART' -PassThru
-    Wait-Spinner 'Шаг 2 из 3 · Устанавливаю Ollama (тихи
+    Wait-Spinner 'Шаг 2 из 3 · Устанавливаю Ollama (тихий режим)' { $p.HasExited }
+    Remove-Item $setup -ErrorAction SilentlyContinue
+    if ($p.ExitCode -ne 0) { Fail 'Установщик Ollama завершился с ошибкой.' }
+
+    if (Test-Path $ollamaExe) { $ollamaCmd = $ollamaExe } else { $ollamaCmd = 'ollama' }
+}
+else {
+    Write-Host '     [+] Ollama уже установлен — шаги 1 и 2 пропущены.' -ForegroundColor Green
+}
+
+# Шаг 3: языковая модель. Вывод ollama скрыт — только анимация.
+$pull = Start-Process -FilePath $ollamaCmd -ArgumentList 'pull', 'qwen2.5:3b' -WindowStyle Hidden -PassThru
+Wait-Spinner 'Шаг 3 из 3 · Скачиваю языковую модель qwen2.5:3b (~2 ГБ)' { $pull.HasExited }
+if ($pull.ExitCode -ne 0) { Fail 'Не удалось скачать модель qwen2.5:3b.' }
+
+Write-Host ''
+Write-Host '   ──────────────────────────────────────────────────' -ForegroundColor DarkMagenta
+Write-Host '     ГОТОВО! Ollama установлен, модель скачана.' -ForegroundColor Green
+Write-Host '   ──────────────────────────────────────────────────' -ForegroundColor DarkMagenta
+Write-Host ''
+Write-Host '     Остался один шаг в самой программе Voice2kzz:' -ForegroundColor White
+Write-Host '       1. Откройте Настройки → Улучшение' -ForegroundColor Gray
+Write-Host '       2. Включите «Улучшать текст локальной LLM (Ollama)»' -ForegroundColor Gray
+Write-Host '       3. Модель: qwen2.5:3b, адрес не меняйте' -ForegroundColor Gray
+Write-Host ''
+Read-Host '  Нажмите Enter, чтобы закрыть' | Out-Null
