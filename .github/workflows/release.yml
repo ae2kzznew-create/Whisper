@@ -40,6 +40,10 @@ jobs:
         run: |
           dotnet publish windows/src/VoxLocal.App/VoxLocal.App.csproj -c Release -r win-x64 --self-contained true -o publish
 
+      - name: Add helper scripts (install Ollama, uninstall)
+        shell: pwsh
+        run: Copy-Item windows/dist/*.cmd publish/
+
       - name: Pack ZIP
         shell: pwsh
         run: Compress-Archive -Path publish/* -DestinationPath VoxLocal-win-x64.zip
