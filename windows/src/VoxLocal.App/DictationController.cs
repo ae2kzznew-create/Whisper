@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.InteropServices;
 using VoxLocal.Core.Audio;
+using VoxLocal.Core.History;
 using VoxLocal.Core.Hotkeys;
 using VoxLocal.Core.Insertion;
 using VoxLocal.Core.Models;
@@ -70,6 +71,7 @@ public sealed class DictationController : INotifyPropertyChanged
     private readonly ModelManager _modelManager;
     private readonly TextInserter _inserter;
     private readonly HotkeyManager _hotkeys;
+    private readonly HistoryStore? _history;
     private readonly SynchronizationContext _ui;
 
     private IntPtr _targetWindow;
@@ -85,7 +87,8 @@ public sealed class DictationController : INotifyPropertyChanged
         WhisperTranscriber transcriber,
         ModelManager modelManager,
         TextInserter inserter,
-        HotkeyManager hotkeys)
+        HotkeyManager hotkeys,
+        HistoryStore? history = null)
     {
         _settings = settings;
         _permissions = permissions;
@@ -94,6 +97,7 @@ public sealed class DictationController : INotifyPropertyChanged
         _modelManager = modelManager;
         _inserter = inserter;
         _hotkeys = hotkeys;
+        _history = history;
         _ui = SynchronizationContext.Current ?? new SynchronizationContext();
 
         // Recorder callbacks arrive on the capture thread — marshal to UI.
@@ -340,6 +344,11 @@ public sealed class DictationController : INotifyPropertyChanged
                     FinishCompleted("");
                     return;
                 }
+
+                // Wispr-Flow-style safety net: the text is saved to the local
+                // history BEFORE insertion, so it can be recovered from the
+                // tray menu even if the paste into the target app fails.
+                _history?.Add(finalText);
 
                 var insertion = await _inserter.InsertAsync(
                     finalText, _targetWindow, _settings.InsertionMode, ct);

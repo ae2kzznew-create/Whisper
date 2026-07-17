@@ -16,17 +16,20 @@ public sealed class TrayIconController : IDisposable
     private readonly DictationController _dictation;
     private readonly ModelManager _modelManager;
     private readonly Action _openSettings;
+    private readonly Action _openHistory;
     private readonly Action _exit;
 
     public TrayIconController(
         DictationController dictation,
         ModelManager modelManager,
         Action openSettings,
+        Action openHistory,
         Action exit)
     {
         _dictation = dictation;
         _modelManager = modelManager;
         _openSettings = openSettings;
+        _openHistory = openHistory;
         _exit = exit;
 
         _icon = new NotifyIcon
@@ -37,6 +40,8 @@ public sealed class TrayIconController : IDisposable
         // Rebuild on every open so labels follow state and language changes
         // (menuNeedsUpdate analogue).
         _icon.ContextMenuStrip.Opening += (_, _) => RebuildMenu();
+        // Wispr-Flow-style quick access: double-click opens the history.
+        _icon.DoubleClick += (_, _) => _openHistory();
         UpdateIcon(DictationState.Idle);
 
         _dictation.StateChanged += UpdateIcon;
@@ -99,6 +104,7 @@ public sealed class TrayIconController : IDisposable
         });
 
         menu.Items.Add(new ToolStripSeparator());
+        menu.Items.Add(new ToolStripMenuItem(L10n.T("menu.history"), null, (_, _) => _openHistory()));
         menu.Items.Add(new ToolStripMenuItem(L10n.T("menu.settings"), null, (_, _) => _openSettings()));
         menu.Items.Add(new ToolStripMenuItem(L10n.T("menu.models"), null, (_, _) => OpenFolder(_modelManager.ModelsDirectory)));
         menu.Items.Add(new ToolStripMenuItem(L10n.T("menu.logs"), null, (_, _) => OpenFolder(Log.Shared.Directory)));
@@ -120,8 +126,8 @@ public sealed class TrayIconController : IDisposable
 
 /// <summary>
 /// Loads embedded .ico resources (cached). When the optional .ico assets were
-/// not bundled into the build, equivalent glyphs are drawn in code (GDI+), so
-/// the app builds and runs without any icon files.
+/// not bundled into the build, modern colorful glyphs are drawn in code
+/// (GDI+): a gradient badge with a white symbol, matching the Voice2kzz brand.
 /// </summary>
 internal static class TrayIcons
 {
@@ -140,7 +146,8 @@ internal static class TrayIcons
         return icon;
     }
 
-    /// <summary>Programmatic stand-ins for mic / mic.fill / waveform / mic.slash.</summary>
+    /// <summary>Colorful stand-ins for mic / mic.fill / waveform / mic.slash:
+    /// a round gradient badge with a white glyph on top.</summary>
     private static System.Drawing.Icon Draw(string name)
     {
         const int size = 32;
@@ -149,8 +156,39 @@ internal static class TrayIcons
         {
             g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
             g.Clear(System.Drawing.Color.Transparent);
+
+            // Brand gradients: purple→pink (idle), red→orange (recording),
+            // blue→violet (busy), gray (error).
+            System.Drawing.Color c1, c2;
+            if (name.StartsWith("mic-fill", StringComparison.OrdinalIgnoreCase))
+            {
+                c1 = System.Drawing.Color.FromArgb(255, 69, 90);
+                c2 = System.Drawing.Color.FromArgb(255, 138, 76);
+            }
+            else if (name.StartsWith("waveform", StringComparison.OrdinalIgnoreCase))
+            {
+                c1 = System.Drawing.Color.FromArgb(64, 156, 255);
+                c2 = System.Drawing.Color.FromArgb(94, 92, 230);
+            }
+            else if (name.StartsWith("mic-slash", StringComparison.OrdinalIgnoreCase))
+            {
+                c1 = System.Drawing.Color.FromArgb(126, 126, 134);
+                c2 = System.Drawing.Color.FromArgb(84, 84, 94);
+            }
+            else
+            {
+                c1 = System.Drawing.Color.FromArgb(168, 85, 247);
+                c2 = System.Drawing.Color.FromArgb(236, 72, 153);
+            }
+
+            using (var badge = new System.Drawing.Drawing2D.LinearGradientBrush(
+                new System.Drawing.Rectangle(0, 0, size, size), c1, c2, 45f))
+            {
+                g.FillEllipse(badge, 1, 1, size - 2, size - 2);
+            }
+
             var white = System.Drawing.Color.White;
-            using var pen = new System.Drawing.Pen(white, 3f)
+            using var pen = new System.Drawing.Pen(white, 2f)
             {
                 StartCap = System.Drawing.Drawing2D.LineCap.Round,
                 EndCap = System.Drawing.Drawing2D.LineCap.Round,
@@ -160,18 +198,18 @@ internal static class TrayIcons
             if (name.StartsWith("waveform", StringComparison.OrdinalIgnoreCase))
             {
                 // Vertical bars of varying height (SF Symbols "waveform").
-                int[] heights = { 10, 18, 26, 14, 22, 8 };
+                int[] heights = { 8, 14, 18, 10, 14, 6 };
                 for (var i = 0; i < heights.Length; i++)
                 {
-                    var x = 4 + i * 5;
+                    var x = 7f + i * 3.4f;
                     var h = heights[i];
-                    g.FillRectangle(brush, x, (size - h) / 2, 3, h);
+                    g.FillRectangle(brush, x, (size - h) / 2f, 2.2f, h);
                 }
             }
             else
             {
                 // Microphone: capsule + cradle + stem + base.
-                using (var capsule = RoundedRect(12, 3, 8, 14, 4))
+                using (var capsule = RoundedRect(13, 7, 6, 10, 3))
                 {
                     if (name.StartsWith("mic-fill", StringComparison.OrdinalIgnoreCase))
                     {
@@ -182,13 +220,13 @@ internal static class TrayIcons
                         g.DrawPath(pen, capsule);
                     }
                 }
-                g.DrawArc(pen, 8, 8, 16, 14, 0, 180);
-                g.DrawLine(pen, 16, 22, 16, 27);
-                g.DrawLine(pen, 11, 28, 21, 28);
+                g.DrawArc(pen, 10, 11, 12, 10, 0, 180);
+                g.DrawLine(pen, 16, 21, 16, 24);
+                g.DrawLine(pen, 12, 25, 20, 25);
 
                 if (name.StartsWith("mic-slash", StringComparison.OrdinalIgnoreCase))
                 {
-                    g.DrawLine(pen, 5, 3, 27, 29);
+                    g.DrawLine(pen, 9, 8, 23, 25);
                 }
             }
         }

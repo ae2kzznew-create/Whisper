@@ -1,6 +1,7 @@
 using System.Windows;
 using Microsoft.Win32;
 using VoxLocal.Core.Audio;
+using VoxLocal.Core.History;
 using VoxLocal.Core.Hotkeys;
 using VoxLocal.Core.Insertion;
 using VoxLocal.Core.Permissions;
@@ -22,6 +23,7 @@ public partial class App : Application
     private PermissionsService _permissions = null!;
     private ModelManager _modelManager = null!;
     private HotkeyManager _hotkeys = null!;
+    private HistoryStore _history = null!;
     private DictationController _dictation = null!;
     private OverlayWindowController _overlay = null!;
     private TrayIconController _trayIcon = null!;
@@ -29,6 +31,7 @@ public partial class App : Application
 
     private Window? _settingsWindow;
     private Window? _onboardingWindow;
+    private Window? _historyWindow;
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -40,6 +43,10 @@ public partial class App : Application
         var version = typeof(App).Assembly.GetName().Version?.ToString(3) ?? "dev";
         Log.Shared.Info($"VoxLocal starting (v{version})");
 
+        // Make the app findable after "Quit": a Start-menu shortcut (and a
+        // desktop shortcut on the very first run) pointing at the current exe.
+        Shortcuts.EnsureCreated();
+
         // Normal sessions delete their temp WAV themselves; this sweep only
         // catches leftovers from crashes or power loss.
         CleanupOrphanedTempAudio();
@@ -47,6 +54,7 @@ public partial class App : Application
         _permissions = new PermissionsService();
         _modelManager = new ModelManager();
         _hotkeys = new HotkeyManager();
+        _history = new HistoryStore();
 
         _dictation = new DictationController(
             settings: _settings,
@@ -55,7 +63,8 @@ public partial class App : Application
             transcriber: new WhisperTranscriber(),
             modelManager: _modelManager,
             inserter: new TextInserter(),
-            hotkeys: _hotkeys);
+            hotkeys: _hotkeys,
+            history: _history);
 
         _overlay = new OverlayWindowController(_dictation);
 
@@ -70,6 +79,7 @@ public partial class App : Application
             dictation: _dictation,
             modelManager: _modelManager,
             openSettings: ShowSettings,
+            openHistory: ShowHistory,
             exit: Shutdown);
 
         _hotkeys.OnMainKeyDown = () => _dictation.HandleHotkeyDown();
@@ -204,6 +214,20 @@ public partial class App : Application
         _onboardingWindow.Show();
         _onboardingWindow.Activate();
     }
+
+    public void ShowHistory()
+    {
+        if (_historyWindow is null)
+        {
+            _historyWindow = new HistoryWindow(_history)
+            {
+                WindowStartupLocation = WindowStartupLocation.CenterScreen,
+            };
+            _historyWindow.Closed += (_, _) => _historyWindow = null;
+        }
+        _historyWindow.Show();
+        _historyWindow.Activate();
+    }
 }
 
 /// <summary>Shared dependencies handed to the settings/onboarding UI.</summary>
@@ -241,6 +265,81 @@ internal static class LaunchAtLogin
         catch (Exception e)
         {
             Log.Shared.Error($"launch-at-login update failed: {e.Message}");
+        }
+    }
+}
+
+/// <summary>
+/// Creates Start-menu and desktop shortcuts so the app is easy to find after
+/// the user quits it (the exe itself lives in an unzipped folder). The
+/// Start-menu shortcut is re-created whenever it is missing; the desktop
+/// shortcut is created only on the first run, so deleting it is respected.
+/// </summary>
+internal static class Shortcuts
+{
+    public static void EnsureCreated()
+    {
+        try
+        {
+            var exe = Environment.ProcessPath;
+            if (exe is null)
+            {
+                return;
+            }
+            var appData = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "VoxLocal");
+            System.IO.Directory.CreateDirectory(appData);
+            var marker = Path.Combine(appData, "shortcuts-created");
+            var firstRun = !File.Exists(marker);
+
+            var startMenu = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.Programs), "Voice2kzz.lnk");
+            var desktop = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory), "Voice2kzz.lnk");
+
+            if (firstRun || !File.Exists(startMenu))
+            {
+                CreateShortcut(startMenu, exe);
+            }
+            if (firstRun && !File.Exists(desktop))
+            {
+                CreateShortcut(desktop, exe);
+            }
+            if (firstRun)
+            {
+                File.WriteAllText(marker, exe);
+                Log.Shared.Info("created Start-menu and desktop shortcuts");
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Shared.Error($"shortcut creation failed: {e.Message}");
+        }
+    }
+
+    private static void CreateShortcut(string lnkPath, string targetExe)
+    {
+        var shellType = Type.GetTypeFromProgID("WScript.Shell");
+        if (shellType is null)
+        {
+            return;
+        }
+        dynamic? shell = Activator.CreateInstance(shellType);
+        if (shell is null)
+        {
+            return;
+        }
+        try
+        {
+            dynamic shortcut = shell.CreateShortcut(lnkPath);
+            shortcut.TargetPath = targetExe;
+            shortcut.WorkingDirectory = Path.GetDirectoryName(targetExe);
+            shortcut.Description = "Voice2kzz";
+            shortcut.Save();
+        }
+        finally
+        {
+            System.Runtime.InteropServices.Marshal.ReleaseComObject(shell);
         }
     }
 }
