@@ -28,25 +28,35 @@ jobs:
           cmake -S whisper.cpp -B whisper.cpp/build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON
           cmake --build whisper.cpp/build --config Release
 
-      - name: Copy whisper binaries into tools/
-        shell: pwsh
-        run: |
-          New-Item -ItemType Directory -Force -Path windows/src/VoxLocal.App/tools | Out-Null
-          Copy-Item whisper.cpp/build/bin/Release/whisper-cli.exe windows/src/VoxLocal.App/tools/
-          Copy-Item whisper.cpp/build/bin/Release/*.dll windows/src/VoxLocal.App/tools/
-
-      # Один exe-файл: все библиотеки .NET упаковываются внутрь VoxLocal.exe,
-      # снаружи остаются только папка tools/ (движок распознавания) и скрипты.
+      # Один exe-файл: все библиотеки .NET упаковываются внутрь VoxLocal.exe.
+      # Важно: движок распознавания копируется в publish/tools ПОСЛЕ публикации,
+      # иначе упаковщик затягивает его файлы внутрь exe и папка tools оказывается пустой.
       - name: Publish VoxLocal (single-file, self-contained win-x64)
         shell: pwsh
         run: |
           dotnet publish windows/src/VoxLocal.App/VoxLocal.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -p:DebugSymbols=false -o publish
+
+      - name: Copy whisper binaries into publish/tools
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path publish/tools | Out-Null
+          Copy-Item whisper.cpp/build/bin/Release/whisper-cli.exe publish/tools/
+          Copy-Item whisper.cpp/build/bin/Release/*.dll publish/tools/
 
       - name: Add helper scripts (install Ollama, uninstall)
         shell: pwsh
         run: |
           Copy-Item windows/dist/*.cmd publish/
           Remove-Item publish/*.pdb -ErrorAction SilentlyContinue
+
+      - name: Verify package layout
+        shell: pwsh
+        run: |
+          if (!(Test-Path publish/VoxLocal.exe)) { throw "VoxLocal.exe missing" }
+          if (!(Test-Path publish/tools/whisper-cli.exe)) { throw "tools/whisper-cli.exe missing" }
+          if (!(Test-Path publish/install-ollama.cmd)) { throw "install-ollama.cmd missing" }
+          if (!(Test-Path publish/uninstall.cmd)) { throw "uninstall.cmd missing" }
+          Get-ChildItem -Recurse publish | Select-Object FullName
 
       - name: Pack ZIP
         shell: pwsh
