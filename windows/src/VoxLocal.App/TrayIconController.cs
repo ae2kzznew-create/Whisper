@@ -45,7 +45,7 @@ public sealed class TrayIconController : IDisposable
     private void UpdateIcon(DictationState state)
     {
         // SF Symbols mic / mic.fill / waveform / mic.slash → own .ico assets
-        // embedded in the executable.
+        // embedded in the executable (or drawn in code when assets are absent).
         var resource = state switch
         {
             DictationState.Recording => "mic-fill.ico",
@@ -118,7 +118,11 @@ public sealed class TrayIconController : IDisposable
     }
 }
 
-/// <summary>Loads embedded .ico resources (cached).</summary>
+/// <summary>
+/// Loads embedded .ico resources (cached). When the optional .ico assets were
+/// not bundled into the build, equivalent glyphs are drawn in code (GDI+), so
+/// the app builds and runs without any icon files.
+/// </summary>
 internal static class TrayIcons
 {
     private static readonly Dictionary<string, System.Drawing.Icon> Cache = new();
@@ -130,10 +134,90 @@ internal static class TrayIcons
             return cached;
         }
         var assembly = typeof(TrayIcons).Assembly;
-        using var stream = assembly.GetManifestResourceStream($"VoxLocal.App.Icons.{name}")
-            ?? throw new InvalidOperationException($"missing tray icon resource: {name}");
-        var icon = new System.Drawing.Icon(stream);
+        using var stream = assembly.GetManifestResourceStream($"VoxLocal.App.Icons.{name}");
+        var icon = stream is not null ? new System.Drawing.Icon(stream) : Draw(name);
         Cache[name] = icon;
         return icon;
     }
+
+    /// <summary>Programmatic stand-ins for mic / mic.fill / waveform / mic.slash.</summary>
+    private static System.Drawing.Icon Draw(string name)
+    {
+        const int size = 32;
+        using var bitmap = new System.Drawing.Bitmap(size, size);
+        using (var g = System.Drawing.Graphics.FromImage(bitmap))
+        {
+            g.SmoothingMode = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
+            g.Clear(System.Drawing.Color.Transparent);
+            var white = System.Drawing.Color.White;
+            using var pen = new System.Drawing.Pen(white, 3f)
+            {
+                StartCap = System.Drawing.Drawing2D.LineCap.Round,
+                EndCap = System.Drawing.Drawing2D.LineCap.Round,
+            };
+            using var brush = new System.Drawing.SolidBrush(white);
+
+            if (name.StartsWith("waveform", StringComparison.OrdinalIgnoreCase))
+            {
+                // Vertical bars of varying height (SF Symbols "waveform").
+                int[] heights = { 10, 18, 26, 14, 22, 8 };
+                for (var i = 0; i < heights.Length; i++)
+                {
+                    var x = 4 + i * 5;
+                    var h = heights[i];
+                    g.FillRectangle(brush, x, (size - h) / 2, 3, h);
+                }
+            }
+            else
+            {
+                // Microphone: capsule + cradle + stem + base.
+                using (var capsule = RoundedRect(12, 3, 8, 14, 4))
+                {
+                    if (name.StartsWith("mic-fill", StringComparison.OrdinalIgnoreCase))
+                    {
+                        g.FillPath(brush, capsule);
+                    }
+                    else
+                    {
+                        g.DrawPath(pen, capsule);
+                    }
+                }
+                g.DrawArc(pen, 8, 8, 16, 14, 0, 180);
+                g.DrawLine(pen, 16, 22, 16, 27);
+                g.DrawLine(pen, 11, 28, 21, 28);
+
+                if (name.StartsWith("mic-slash", StringComparison.OrdinalIgnoreCase))
+                {
+                    g.DrawLine(pen, 5, 3, 27, 29);
+                }
+            }
+        }
+
+        var handle = bitmap.GetHicon();
+        try
+        {
+            using var native = System.Drawing.Icon.FromHandle(handle);
+            // Clone detaches the icon from the unmanaged handle so it can be destroyed.
+            return (System.Drawing.Icon)native.Clone();
+        }
+        finally
+        {
+            _ = DestroyIcon(handle);
+        }
+    }
+
+    private static System.Drawing.Drawing2D.GraphicsPath RoundedRect(int x, int y, int width, int height, int radius)
+    {
+        var d = radius * 2;
+        var path = new System.Drawing.Drawing2D.GraphicsPath();
+        path.AddArc(x, y, d, d, 180, 90);
+        path.AddArc(x + width - d, y, d, d, 270, 90);
+        path.AddArc(x + width - d, y + height - d, d, d, 0, 90);
+        path.AddArc(x, y + height - d, d, d, 90, 90);
+        path.CloseFigure();
+        return path;
+    }
+
+    [System.Runtime.InteropServices.DllImport("user32.dll", SetLastError = true)]
+    private static extern bool DestroyIcon(IntPtr handle);
 }

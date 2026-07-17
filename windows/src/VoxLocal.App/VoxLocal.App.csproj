@@ -9,7 +9,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <RootNamespace>VoxLocal.App</RootNamespace>
     <AssemblyName>VoxLocal</AssemblyName>
-    <ApplicationIcon>Icons\mic.ico</ApplicationIcon>
+    <!-- Иконка exe подключается, только если файл существует; без неё сборка проходит -->
+    <ApplicationIcon Condition="Exists('Icons\mic.ico')">Icons\mic.ico</ApplicationIcon>
     <StartupObject>VoxLocal.App.Program</StartupObject>
   </PropertyGroup>
   <ItemGroup>
@@ -22,7 +23,12 @@
                       LogicalName="VoxLocal.Core.Resources.ru.Localizable.strings" />
     <EmbeddedResource Include="Resources\en\Localizable.strings"
                       LogicalName="VoxLocal.Core.Resources.en.Localizable.strings" />
+    <!-- Необязательные .ico: glob включает только реально существующие файлы -->
     <EmbeddedResource Include="Icons\*.ico"
                       LogicalName="VoxLocal.App.Icons.%(Filename)%(Extension)" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Движок распознавания: содержимое tools/ копируется в выходную папку рядом с exe -->
+    <None Include="tools\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

@@ -4,6 +4,23 @@
 
 Порт оригинального macOS-приложения VoxLocal (Swift/AppKit) на **C#/.NET 8 + WPF**. Лицензия MIT.
 
+## Скачать готовую сборку (ничего компилировать не нужно)
+
+В репозитории настроен GitHub Actions (`.github/workflows/release.yml`): он сам собирает whisper.cpp и приложение и публикует готовый архив.
+
+**Для пользователей:** скачайте `VoxLocal-win-x64.zip` со страницы [Releases](https://github.com/ae2kzznew-create/Whisper/releases), распакуйте и запустите `VoxLocal.exe`. Установка .NET не требуется (сборка self-contained), движок распознавания уже внутри (`tools/`). Модели Whisper скачиваются при первом запуске из самого приложения.
+
+**Для мейнтенера — как выпустить релиз:**
+
+```powershell
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+или вручную: вкладка **Actions** → «Release Windows build» → **Run workflow** (архив появится в артефактах запуска; релиз на странице Releases создаётся только при пуше тега).
+
+Далее — инструкция для ручной сборки из исходников.
+
 ## Требования
 
 - Windows 10 21H2+ / Windows 11
@@ -20,13 +37,12 @@ dotnet build -c Release
 
 Результат: `src/VoxLocal.App/bin/Release/net8.0-windows/VoxLocal.exe`.
 
-> **Важно:** перед первой сборкой добавьте иконки и whisper-cli (см. ниже), иначе:
-> - без файлов `Icons/*.ico` сборка упадёт (они включены в .csproj как обязательные ресурсы);
-> - без `tools/whisper-cli.exe` приложение соберётся, но онбординг сообщит, что движок распознавания не найден.
+> **Важно:** без `tools/whisper-cli.exe` приложение соберётся, но онбординг сообщит, что движок распознавания не найден (см. раздел 2). Иконки `Icons/*.ico` необязательны: без них иконки трея рисуются программно, а у exe будет стандартная иконка.
 
-## 1. Иконки (`src/VoxLocal.App/Icons/`)
+## 1. Иконки (`src/VoxLocal.App/Icons/`) — необязательно
 
-Нужны 4 файла: `mic.ico`, `mic-fill.ico`, `waveform.ico`, `mic-slash.ico` (мультиразмерные .ico: 16/24/32/48/256 px). Это аналоги SF Symbols `mic`, `mic.fill`, `waveform`, `mic.slash` — можно сконвертировать любые подходящие глифы (например, из Fluent UI System Icons) в .ico.
+По умолчанию иконки трея рисуются кодом (GDI+), поэтому проект собирается и работает без каких-либо .ico-файлов.
+Если хотите фирменные иконки, положите сюда 4 файла: `mic.ico`, `mic-fill.ico`, `waveform.ico`, `mic-slash.ico` (мультиразмерные .ico: 16/24/32/48/256 px). Это аналоги SF Symbols `mic`, `mic.fill`, `waveform`, `mic.slash` — можно сконвертировать любые подходящие глифы (например, из Fluent UI System Icons) в .ico. При наличии файлов они автоматически встраиваются в приложение и используются вместо программных, а `mic.ico` становится иконкой exe.
 
 ## 2. Движок распознавания (`src/VoxLocal.App/tools/`)
 
@@ -39,11 +55,11 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
 ```
 
-Скопируйте в `src/VoxLocal.App/tools/` рядом с будущим exe:
+Скопируйте в `src/VoxLocal.App/tools/`:
 - `build/bin/Release/whisper-cli.exe`
 - все `ggml*.dll` / `whisper.dll` из той же папки
 
-(Файлы из `tools/` копируются в выходную папку при сборке; приложение ищет `tools/whisper-cli.exe` рядом с исполняемым файлом.)
+(Файлы из `tools/` копируются в выходную папку при сборке; приложение ищет `tools/whisper-cli.exe` рядом с исполняемым файлом. Альтернатива без компиляции: взять готовые Windows-бинари со страницы релизов whisper.cpp.)
 
 ## 3. Модели Whisper
 
@@ -80,6 +96,6 @@ VoxLocal/
     │   ├── Insertion, Refinement, Settings,
     │   └── Permissions, Utilities
     ├── Resources/{ru,en}/Localizable.strings
-    ├── Icons/  (добавьте 4 .ico — см. выше)
-    └── tools/  (добавьте whisper-cli.exe + DLL — см. выше)
+    ├── Icons/  (необязательно: 4 .ico — см. раздел 1)
+    └── tools/  (whisper-cli.exe + DLL — см. раздел 2)
 ```
