@@ -358,6 +358,7 @@ public sealed class DictationController : INotifyPropertyChanged
                 {
                     case InsertionOutcome.InsertedViaAutomation:
                     case InsertionOutcome.PastedViaClipboard:
+                    case InsertionOutcome.TypedViaKeyboard:
                         FinishCompleted("");
                         break;
                     case InsertionOutcome.ClipboardOnly clipboardOnly:
