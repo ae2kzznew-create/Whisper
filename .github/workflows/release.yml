@@ -35,14 +35,18 @@ jobs:
           Copy-Item whisper.cpp/build/bin/Release/whisper-cli.exe windows/src/VoxLocal.App/tools/
           Copy-Item whisper.cpp/build/bin/Release/*.dll windows/src/VoxLocal.App/tools/
 
-      - name: Publish VoxLocal (self-contained win-x64)
+      # Один exe-файл: все библиотеки .NET упаковываются внутрь VoxLocal.exe,
+      # снаружи остаются только папка tools/ (движок распознавания) и скрипты.
+      - name: Publish VoxLocal (single-file, self-contained win-x64)
         shell: pwsh
         run: |
-          dotnet publish windows/src/VoxLocal.App/VoxLocal.App.csproj -c Release -r win-x64 --self-contained true -o publish
+          dotnet publish windows/src/VoxLocal.App/VoxLocal.App.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -p:DebugSymbols=false -o publish
 
       - name: Add helper scripts (install Ollama, uninstall)
         shell: pwsh
-        run: Copy-Item windows/dist/*.cmd publish/
+        run: |
+          Copy-Item windows/dist/*.cmd publish/
+          Remove-Item publish/*.pdb -ErrorAction SilentlyContinue
 
       - name: Pack ZIP
         shell: pwsh

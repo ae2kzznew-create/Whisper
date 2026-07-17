@@ -22,7 +22,8 @@ public sealed class WhisperTranscriber
     /// Candidate locations for whisper-cli.exe, in priority order:
     /// 1. VOXLOCAL_WHISPER_CLI environment variable (tests, development),
     /// 2. next to the application executable (packaged app),
-    /// 3. the in-repo CMake build output (running from the repo).
+    /// 3. the tools/ subfolder next to the executable (packaged app layout),
+    /// 4. the in-repo CMake build output (running from the repo).
     /// </summary>
     public static IReadOnlyList<string> BinaryCandidates()
     {
@@ -33,6 +34,7 @@ public sealed class WhisperTranscriber
             candidates.Add(env);
         }
         candidates.Add(Path.Combine(AppContext.BaseDirectory, "whisper-cli.exe"));
+        candidates.Add(Path.Combine(AppContext.BaseDirectory, "tools", "whisper-cli.exe"));
         var cwd = Directory.GetCurrentDirectory();
         candidates.Add(Path.Combine(cwd, "vendor", "whisper.cpp", "build", "bin", "Release", "whisper-cli.exe"));
         candidates.Add(Path.Combine(cwd, "vendor", "whisper.cpp", "build", "bin", "whisper-cli.exe"));
