@@ -222,7 +222,7 @@ public partial class SettingsWindow : Window
             var name = new TextBlock { Text = info.Name, VerticalAlignment = VerticalAlignment.Center };
             if (!info.Multilingual)
             {
-                name.Text += $"  ({L10n.T(\"settings.model.englishOnly\")})";
+                name.Text += "  (" + L10n.T("settings.model.englishOnly") + ")";
             }
             DockPanel.SetDock(name, Dock.Left);
             row.Children.Add(name);
