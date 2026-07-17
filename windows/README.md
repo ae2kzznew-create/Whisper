@@ -4,6 +4,23 @@
 
 Порт оригинального macOS-приложения VoxLocal (Swift/AppKit) на **C#/.NET 8 + WPF**. Лицензия MIT.
 
+## Скачать готовую сборку (ничего компилировать не нужно)
+
+В репозитории настроен GitHub Actions (`.github/workflows/release.yml`): он сам собирает whisper.cpp и приложение и публикует готовый архив.
+
+**Для пользователей:** скачайте `VoxLocal-win-x64.zip` со страницы [Releases](https://github.com/ae2kzznew-create/Whisper/releases), распакуйте и запустите `VoxLocal.exe`. Установка .NET не требуется (сборка self-contained), движок распознавания уже внутри (`tools/`). Модели Whisper скачиваются при первом запуске из самого приложения.
+
+**Для мейнтенера — как выпустить релиз:**
+
+```powershell
+git tag v1.0.0
+git push origin v1.0.0
+```
+
+или вручную: вкладка **Actions** → «Release Windows build» → **Run workflow** (архив появится в артефактах запуска; релиз на странице Releases создаётся только при пуше тега).
+
+Далее — инструкция для ручной сборки из исходников.
+
 ## Требования
 
 - Windows 10 21H2+ / Windows 11
@@ -38,11 +55,11 @@ cmake -B build -DCMAKE_BUILD_TYPE=Release
 cmake --build build --config Release
 ```
 
-Скопируйте в `src/VoxLocal.App/tools/` рядом с будущим exe:
+Скопируйте в `src/VoxLocal.App/tools/`:
 - `build/bin/Release/whisper-cli.exe`
 - все `ggml*.dll` / `whisper.dll` из той же папки
 
-(Файлы из `tools/` копируются в выходную папку при сборке; приложение ищет `tools/whisper-cli.exe` рядом с исполняемым файлом.)
+(Файлы из `tools/` копируются в выходную папку при сборке; приложение ищет `tools/whisper-cli.exe` рядом с исполняемым файлом. Альтернатива без компиляции: взять готовые Windows-бинари со страницы релизов whisper.cpp.)
 
 ## 3. Модели Whisper
 
@@ -80,5 +97,5 @@ VoxLocal/
     │   └── Permissions, Utilities
     ├── Resources/{ru,en}/Localizable.strings
     ├── Icons/  (необязательно: 4 .ico — см. раздел 1)
-    └── tools/  (добавьте whisper-cli.exe + DLL — см. раздел 2)
+    └── tools/  (whisper-cli.exe + DLL — см. раздел 2)
 ```

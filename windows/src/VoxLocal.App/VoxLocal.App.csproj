@@ -27,4 +27,8 @@
     <EmbeddedResource Include="Icons\*.ico"
                       LogicalName="VoxLocal.App.Icons.%(Filename)%(Extension)" />
   </ItemGroup>
+  <ItemGroup>
+    <!-- Движок распознавания: содержимое tools/ копируется в выходную папку рядом с exe -->
+    <None Include="tools\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>

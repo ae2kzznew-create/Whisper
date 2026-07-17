@@ -1,0 +1,58 @@
+# Автоматическая сборка готового архива VoxLocal для Windows.
+# Запускается при пуше тега v* (публикует Release) или вручную из вкладки Actions.
+name: Release Windows build
+
+on:
+  push:
+    tags: ["v*"]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup .NET 8
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+
+      - name: Build whisper.cpp (v1.9.1)
+        shell: pwsh
+        run: |
+          git clone --depth 1 --branch v1.9.1 https://github.com/ggerganov/whisper.cpp
+          cmake -S whisper.cpp -B whisper.cpp/build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=ON
+          cmake --build whisper.cpp/build --config Release
+
+      - name: Copy whisper binaries into tools/
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force -Path windows/src/VoxLocal.App/tools | Out-Null
+          Copy-Item whisper.cpp/build/bin/Release/whisper-cli.exe windows/src/VoxLocal.App/tools/
+          Copy-Item whisper.cpp/build/bin/Release/*.dll windows/src/VoxLocal.App/tools/
+
+      - name: Publish VoxLocal (self-contained win-x64)
+        shell: pwsh
+        run: |
+          dotnet publish windows/src/VoxLocal.App/VoxLocal.App.csproj -c Release -r win-x64 --self-contained true -o publish
+
+      - name: Pack ZIP
+        shell: pwsh
+        run: Compress-Archive -Path publish/* -DestinationPath VoxLocal-win-x64.zip
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: VoxLocal-win-x64
+          path: VoxLocal-win-x64.zip
+
+      - name: Publish GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: VoxLocal-win-x64.zip
+          generate_release_notes: true
