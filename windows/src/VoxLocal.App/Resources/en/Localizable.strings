@@ -46,10 +46,19 @@
 "menu.start" = "Start Dictation";
 "menu.stop" = "Stop & Transcribe";
 "menu.cancel" = "Cancel Dictation";
+"menu.history" = "Dictation History…";
 "menu.settings" = "Settings…";
 "menu.models" = "Open Model Folder";
 "menu.logs" = "Open Logs";
 "menu.quit" = "Quit Voice2kzz";
+
+/* Dictation history */
+"history.title" = "Dictation history";
+"history.note" = "The last 50 dictations are kept here so you can copy the text even when insertion failed. History is stored only on this PC and never sent anywhere.";
+"history.empty" = "Nothing here yet. Dictate something and the text will appear here.";
+"history.copy" = "Copy";
+"history.copied" = "Copied ✓";
+"history.clear" = "Clear";
 
 /* Models */
 "models.download.busy" = "Another model is already downloading.";
@@ -147,7 +156,7 @@
 "privacy.p3" = "The temporary audio recording is deleted right after transcription, cancellation or an error.";
 "privacy.p4" = "Ollama requests go to localhost only and never leave the computer.";
 "privacy.p5" = "No analytics, telemetry or ads. The app makes no network requests except model downloads you explicitly start.";
-"privacy.logs" = "Logs contain no audio, no dictated text and no clipboard contents; file paths are shortened. Log size is bounded.";
+"privacy.logs" = "Logs contain no audio, no dictated text and no clipboard contents; file paths are shortened. Log size is bounded. Dictation history is stored locally only and can be cleared in the Dictation History window.";
 
 /* Onboarding */
 "onboarding.title" = "Welcome to Voice2kzz";
