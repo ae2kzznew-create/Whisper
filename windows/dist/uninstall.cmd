@@ -14,7 +14,7 @@ echo Будут удалены:
 echo   - папка программы:  %TARGET%
 echo   - настройки:        %APPDATA%\VoxLocal
 echo   - модели и логи:    %LOCALAPPDATA%\VoxLocal
-echo   - автозапуск при входе в систему
+echo   - временный кэш и автозапуск при входе в систему
 echo.
 set /p CONFIRM=Продолжить? [y/N]: 
 if /i not "%CONFIRM%"=="y" (
@@ -29,9 +29,11 @@ taskkill /im VoxLocal.exe /f >nul 2>nul
 echo Убираю автозапуск...
 reg delete "HKCU\Software\Microsoft\Windows\CurrentVersion\Run" /v VoxLocal /f >nul 2>nul
 
-echo Удаляю настройки, модели и логи...
+echo Удаляю настройки, модели, логи и временный кэш...
 rmdir /s /q "%APPDATA%\VoxLocal" >nul 2>nul
 rmdir /s /q "%LOCALAPPDATA%\VoxLocal" >nul 2>nul
+rmdir /s /q "%TEMP%\.net\VoxLocal" >nul 2>nul
+del /q "%TEMP%\voxlocal-*.wav" >nul 2>nul
 
 echo Удаляю папку программы...
 echo @echo off> "%TEMP%\voxlocal-remove.cmd"
